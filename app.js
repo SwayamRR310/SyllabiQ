@@ -959,10 +959,11 @@ async function handleChatSubmit(e) {
 }
 
 async function callGemini(doubt, key) {
-  // Using gemini-2.5-flash with token limit
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`;
+  // Use the recommended model from the API error
+  const modelName = "gemini-3.8-flash";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(key)}`;
 
-  const prompt = `You are a strict Board Exam Doubt Solver for ${currentBoard}.
+  const prompt = `You are a concise Board Exam Doubt Solver for ${currentBoard}.
 Solve the following doubt directly and concisely according to official board step-marking criteria:
 Doubt: "${doubt}"
 
