@@ -8,7 +8,7 @@ code, pre {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Chips for quick questions */
+/* Question filter chips */
 .chip {
   flex-shrink: 0;
   font-size: 11px;
@@ -37,7 +37,6 @@ code, pre {
 .nav-tab.active {
   color: #7c3aed;
 }
-
 .dark .nav-tab.active {
   color: #a78bfa;
 }
@@ -72,4 +71,13 @@ code, pre {
 }
 .dark .math-final {
   color: #34d399;
+}
+
+/* Chapter Checklist Item Animations */
+.chapter-row {
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.chapter-row.completed {
+  border-color: rgba(16, 185, 129, 0.3);
+  background-color: rgba(16, 185, 129, 0.04);
 }

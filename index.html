@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>SyllabiQ - Board Exam AI & PYQ Hub</title>
+  <title>SyllabiQ - Board Exam AI & Student Hub</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -33,12 +33,12 @@
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-md shadow-violet-500/20 text-white">
-          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-md shadow-violet-500/20 text-white font-extrabold text-sm">
+          SQ
         </div>
         <div>
           <span class="font-extrabold text-base tracking-tight bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">SyllabiQ</span>
-          <span class="text-[10px] block font-semibold text-slate-400 uppercase tracking-wider">Board AI Hub</span>
+          <span class="text-[10px] block font-semibold text-slate-400 uppercase tracking-wider" id="headerUserGreeting">Guest Student</span>
         </div>
       </div>
 
@@ -49,8 +49,14 @@
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
         </button>
 
-        <!-- API Key Manager -->
-        <button id="apiKeyModalBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Set Gemini API Key">
+        <!-- Auth / Profile Avatar Button -->
+        <button id="authBtn" class="flex items-center gap-1.5 p-1.5 sm:px-2.5 rounded-full bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-900/50 hover:bg-violet-100 transition text-xs font-semibold">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span id="authBtnText" class="hidden sm:inline">Sign In</span>
+        </button>
+
+        <!-- Gemini API Key Modal -->
+        <button id="apiKeyModalBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Gemini AI Key">
           <i data-lucide="key" class="w-4 h-4"></i>
         </button>
 
@@ -68,82 +74,131 @@
 
     <!-- TAB 1: HOME DASHBOARD -->
     <section id="viewHome" class="space-y-5">
-      <!-- Portion Alert Banner -->
+      <!-- Portion Notice Alert -->
       <div id="portionNotice" class="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
           <i data-lucide="bell" class="w-4 h-4"></i>
         </div>
         <div class="flex-1 text-xs">
-          <h4 class="font-bold text-slate-900 dark:text-white">Portion Watchdog Active</h4>
+          <h4 class="font-bold text-slate-900 dark:text-white">Portion Watchdog Synced</h4>
           <p class="text-slate-600 dark:text-slate-400 mt-0.5" id="portionNoticeText">
-            Rationalized NCERT updates synced. Outdated questions are automatically flagged.
+            Rationalized portions mapped for 2025-2026. Outdated questions are automatically marked.
           </p>
         </div>
       </div>
 
-      <!-- Quick Stats Grid -->
+      <!-- Quick Metrics Grid -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-600 flex items-center justify-center font-bold">
-            🔥
+        <!-- Streak Card with Check-In -->
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-pointer group" onclick="claimDailyStreak()">
+          <div class="flex items-center justify-between">
+            <span class="text-2xl">🔥</span>
+            <span id="streakBadge" class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-600">Tap to Check-in</span>
           </div>
-          <div>
-            <div class="text-lg font-extrabold" id="streakDays">6 Days</div>
+          <div class="mt-2">
+            <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="statStreak">1 Day</div>
             <div class="text-[11px] text-slate-500 font-medium">Daily Streak</div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-950/60 text-violet-600 flex items-center justify-center">
-            <i data-lucide="check-circle" class="w-5 h-5"></i>
+        <!-- Syllabus Coverage -->
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <i data-lucide="pie-chart" class="w-5 h-5 text-violet-600"></i>
+            <span class="text-[10px] font-semibold text-slate-400" id="statChaptersRatio">0/0</span>
           </div>
-          <div>
-            <div class="text-lg font-extrabold">88.4%</div>
-            <div class="text-[11px] text-slate-500 font-medium">Portion Synced</div>
-          </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 flex items-center justify-center">
-            <i data-lucide="file-text" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <div class="text-lg font-extrabold">142</div>
-            <div class="text-[11px] text-slate-500 font-medium">High-Yield PYQs</div>
+          <div class="mt-2">
+            <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="statProgressPct">0%</div>
+            <div class="text-[11px] text-slate-500 font-medium">Portion Done</div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
-            <i data-lucide="target" class="w-5 h-5"></i>
+        <!-- Doubts Solved Counter -->
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <i data-lucide="sparkles" class="w-5 h-5 text-cyan-600"></i>
+            <span class="text-[10px] font-semibold text-cyan-600 bg-cyan-50 dark:bg-cyan-950/40 px-1 rounded">AI</span>
           </div>
-          <div>
-            <div class="text-lg font-extrabold">95%+</div>
-            <div class="text-[11px] text-slate-500 font-medium">Goal Tier</div>
+          <div class="mt-2">
+            <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="statDoubts">0</div>
+            <div class="text-[11px] text-slate-500 font-medium">Doubts Solved</div>
+          </div>
+        </div>
+
+        <!-- Target Grade -->
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <i data-lucide="target" class="w-5 h-5 text-emerald-600"></i>
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1 rounded" id="statTargetBadge">Tier 1</span>
+          </div>
+          <div class="mt-2">
+            <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="statTargetScore">95%+</div>
+            <div class="text-[11px] text-slate-500 font-medium">Board Target</div>
           </div>
         </div>
       </div>
 
       <!-- Quick Action Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div onclick="switchTab('ai')" class="cursor-pointer bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-2xl p-5 shadow-lg shadow-violet-500/15 relative overflow-hidden group">
-          <div class="relative z-10">
-            <span class="inline-flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase bg-white/20 px-2 py-0.5 rounded-full mb-2">Instant Stepwise Help</span>
-            <h3 class="text-lg font-bold">Ask Doubt Solver AI</h3>
-            <p class="text-violet-100 text-xs mt-1">Get instant board-marking step solutions with zero token bloat.</p>
-          </div>
-          <i data-lucide="sparkles" class="w-20 h-20 text-white/10 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform"></i>
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase bg-white/20 px-2 py-0.5 rounded-full mb-2">Low-Token AI</span>
+          <h3 class="text-base font-bold">Ask Doubt Solver</h3>
+          <p class="text-violet-100 text-xs mt-1">Numerical steps & examiners' marking guidelines.</p>
         </div>
 
-        <div onclick="switchTab('pyqs')" class="cursor-pointer bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:border-violet-500/40 transition group">
-          <span class="inline-flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full mb-2">Priority Questions</span>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Frequent PYQ Vault</h3>
-          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Sorted strictly by frequency of recurrence in past 10 years.</p>
+        <div onclick="switchTab('progress')" class="cursor-pointer bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:border-violet-500/40 transition">
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full mb-2">Checklist & Diagnostics</span>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Track Chapters</h3>
+          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Tick off completed chapters & simulate marks.</p>
+        </div>
+
+        <div onclick="switchTab('pyqs')" class="cursor-pointer bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:border-violet-500/40 transition">
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-cyan-600 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full mb-2">Frequency Sorted</span>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Frequent PYQs</h3>
+          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Study questions recurring 5x+ in board history.</p>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: DOUBT SOLVER AI -->
+    <!-- TAB 2: PROGRESS TRACKING & CHAPTER CHECKLIST -->
+    <section id="viewProgress" class="hidden space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Syllabus Progress & Simulator</h2>
+          <p class="text-xs text-slate-500">Check off chapters you've revised to update your board readiness.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="resetCurrentBoardProgress()" class="text-xs text-slate-400 hover:text-red-500 transition px-2 py-1">Reset</button>
+        </div>
+      </div>
+
+      <!-- Live Target Progress Bar -->
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
+        <div class="flex items-center justify-between text-xs font-semibold">
+          <span>Overall Preparation Meter</span>
+          <span id="progressPercentageLabel" class="text-violet-600 dark:text-violet-400 font-bold">0%</span>
+        </div>
+        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+          <div id="progressBarFill" class="bg-gradient-to-r from-violet-600 to-cyan-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-[11px] text-slate-400">
+          <span id="progressSummaryText">0 of 0 chapters completed</span>
+          <span id="predictedScoreBadge" class="font-semibold text-emerald-600">Est. Score: ~40%</span>
+        </div>
+      </div>
+
+      <!-- Subject Filter Pills -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar" id="progressSubjectPills">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Chapter Checklist Container -->
+      <div id="chapterChecklistContainer" class="space-y-2">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- TAB 3: DOUBT SOLVER AI -->
     <section id="viewAI" class="hidden space-y-4">
       <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -153,32 +208,32 @@
             </div>
             <div>
               <h3 class="font-bold text-sm">Exam Doubt AI</h3>
-              <p class="text-[11px] text-slate-400">Strict low-token mode · Stepwise board answers</p>
+              <p class="text-[11px] text-slate-400">Stepwise board marking format & low-token engine</p>
             </div>
           </div>
           <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">Token Saver Active</span>
         </div>
 
-        <!-- Chat Log -->
+        <!-- Chat Messages -->
         <div id="chatLog" class="py-4 space-y-3 min-h-[280px] max-h-[380px] overflow-y-auto">
           <div class="flex items-start gap-2.5">
-            <div class="w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs shrink-0">AI</div>
+            <div class="w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs shrink-0 font-bold">AI</div>
             <div class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-3 rounded-2xl rounded-tl-sm max-w-[85%]">
-              Hello! Drop any exam numerical, reaction, or concept question. I solve strictly according to step-marking criteria.
+              Hello! I'm calibrated for <strong id="chatBoardLabel">CBSE 10th</strong>. Send any numerical, derivation, or formula doubt for stepwise marks breakdown.
             </div>
           </div>
         </div>
 
-        <!-- Chips -->
+        <!-- Fast Preset Chips -->
         <div class="flex gap-1.5 overflow-x-auto py-2 no-scrollbar border-t border-slate-100 dark:border-slate-800">
-          <button onclick="presetQuestion('Find focal length of convex lens with power +2.5 D with steps')" class="chip">Convex Lens Power</button>
+          <button onclick="presetQuestion('Find focal length of convex lens with power +2.5 D with steps')" class="chip">Lens Power Calculation</button>
           <button onclick="presetQuestion('State Ohm\'s Law and write formula with SI units')" class="chip">Ohm's Law</button>
           <button onclick="presetQuestion('Balance: Fe + H2O -> Fe3O4 + H2 with steps')" class="chip">Balance Reaction</button>
         </div>
 
-        <!-- Input Box -->
+        <!-- Input Form -->
         <form id="chatForm" class="flex gap-2 pt-2">
-          <input type="text" id="doubtInput" placeholder="Ask a doubt or paste numerical..." class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500" required>
+          <input type="text" id="doubtInput" placeholder="Type a numerical or conceptual doubt..." class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500" required>
           <button type="submit" id="sendBtn" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition">
             <span>Solve</span>
             <i data-lucide="send" class="w-3.5 h-3.5"></i>
@@ -187,47 +242,52 @@
       </div>
     </section>
 
-    <!-- TAB 3: HIGH-FREQUENCY PYQs -->
+    <!-- TAB 4: HIGH-FREQUENCY PYQs -->
     <section id="viewPYQs" class="hidden space-y-4">
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-bold text-slate-900 dark:text-white">Frequent Board PYQs</h2>
-          <p class="text-xs text-slate-500">Sorted by past board recurrence rate</p>
+          <p class="text-xs text-slate-500">Ranked by appearance in past 10-year board question papers</p>
         </div>
         <select id="subjectFilter" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2.5 py-1.5 font-medium">
           <option value="all">All Subjects</option>
           <option value="Physics">Physics</option>
           <option value="Chemistry">Chemistry</option>
           <option value="Mathematics">Mathematics</option>
+          <option value="Biology">Biology</option>
         </select>
       </div>
 
-      <!-- Question List -->
       <div id="pyqContainer" class="space-y-3">
-        <!-- Rendered via app.js -->
+        <!-- Rendered via JS -->
       </div>
     </section>
 
-    <!-- TAB 4: PORTION UPDATES -->
+    <!-- TAB 5: PORTION WATCHDOG -->
     <section id="viewPortion" class="hidden space-y-4">
       <div>
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Rationalized Portion Tracker</h2>
-        <p class="text-xs text-slate-500">Verified official changes for 2025-2026 Academic Year</p>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Portion Rationalization Tracker</h2>
+        <p class="text-xs text-slate-500">Deleted topics and syllabus updates from official education boards</p>
       </div>
 
       <div id="portionCardList" class="space-y-3">
-        <!-- Rendered via app.js -->
+        <!-- Rendered via JS -->
       </div>
     </section>
 
   </main>
 
-  <!-- Bottom Navigation Bar -->
+  <!-- Bottom Navigation Bar (5 Tabs) -->
   <nav class="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-40">
-    <div class="max-w-md mx-auto grid grid-cols-4 h-16">
+    <div class="max-w-md mx-auto grid grid-cols-5 h-16">
       <button onclick="switchTab('home')" class="nav-tab active flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="home">
         <i data-lucide="home" class="w-5 h-5"></i>
         <span class="text-[10px] mt-1 font-semibold">Home</span>
+      </button>
+
+      <button onclick="switchTab('progress')" class="nav-tab flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="progress">
+        <i data-lucide="check-square" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1 font-semibold">Progress</span>
       </button>
 
       <button onclick="switchTab('ai')" class="nav-tab flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="ai">
@@ -247,10 +307,93 @@
     </div>
   </nav>
 
-  <!-- Modal: Board Selection -->
+  <!-- MODAL: Auth (Sign In / Register) -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900 dark:text-white" id="authModalTitle">Student Sign In</h3>
+          <p class="text-xs text-slate-400" id="authModalSubtitle">Sign in to sync your streak and chapter progress.</p>
+        </div>
+        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="authForm" class="space-y-3">
+        <div id="authNameField" class="hidden space-y-1">
+          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Your Full Name</label>
+          <input type="text" id="authNameInput" placeholder="e.g. Swayam" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Email or Roll ID</label>
+          <input type="text" id="authEmailInput" placeholder="student@example.com" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Passcode</label>
+          <input type="password" id="authPasswordInput" placeholder="••••••••" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs py-2.5 rounded-xl transition">
+          Sign In
+        </button>
+      </form>
+
+      <div class="text-center text-xs text-slate-500 pt-1">
+        <span id="authToggleQuestion">New student here?</span>
+        <button type="button" id="authToggleBtn" class="text-violet-600 dark:text-violet-400 font-bold ml-1 hover:underline">Create Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Student Profile & Settings -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-violet-500/20" id="profileAvatar">
+          S
+        </div>
+        <div>
+          <h3 class="font-bold text-sm text-slate-900 dark:text-white" id="profileName">Swayam</h3>
+          <p class="text-xs text-slate-400" id="profileEmail">swayam@example.com</p>
+        </div>
+      </div>
+
+      <!-- Quick Profile Stats -->
+      <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+        <div>
+          <span class="text-slate-400 block text-[10px]">Registered Board</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200" id="profileBoardLabel">CBSE 10th</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block text-[10px]">Target Score</span>
+          <span class="font-bold text-emerald-600" id="profileTargetScore">95%</span>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Update Target Percentage</label>
+        <div class="flex gap-2">
+          <input type="number" id="targetPercentageInput" min="40" max="100" class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none" value="95">
+          <button onclick="updateTargetScore()" class="bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">Set</button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <button onclick="logoutStudent()" class="w-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 py-2 rounded-xl text-xs font-semibold hover:bg-red-100 dark:hover:bg-red-900/60 transition">
+          Sign Out
+        </button>
+        <button onclick="closeModals()" class="w-full py-1 text-xs text-slate-400 hover:text-slate-600">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Board Selection -->
   <div id="boardModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
-      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Select Your Examination Board</h3>
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Choose Your Examination Board</h3>
       <div class="space-y-2">
         <button onclick="selectBoard('CBSE 10th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">CBSE Class 10</button>
         <button onclick="selectBoard('CBSE 12th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">CBSE Class 12</button>
@@ -258,20 +401,20 @@
         <button onclick="selectBoard('MH SSC 10th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">Maharashtra SSC 10th</button>
         <button onclick="selectBoard('MH HSC 12th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">Maharashtra HSC 12th</button>
       </div>
-      <button onclick="closeModals()" class="w-full py-2 text-xs font-medium text-slate-400 hover:text-slate-600">Close</button>
+      <button onclick="closeModals()" class="w-full py-1 text-xs text-slate-400">Cancel</button>
     </div>
   </div>
 
-  <!-- Modal: API Key -->
+  <!-- MODAL: API Key -->
   <div id="keyModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
       <div>
         <h3 class="font-bold text-sm text-slate-900 dark:text-white">Gemini API Configuration</h3>
-        <p class="text-xs text-slate-400 mt-1">Saved securely in browser local storage.</p>
+        <p class="text-xs text-slate-400 mt-1">Free API Key from Google AI Studio. Stored strictly in local browser storage.</p>
       </div>
-      <input type="password" id="apiKeyInput" placeholder="Paste AI Studio API Key..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-violet-500 outline-none">
+      <input type="password" id="apiKeyInput" placeholder="Paste AI Studio Key (AIza...)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-violet-500 outline-none">
       <div class="flex gap-2">
-        <button onclick="saveApiKey()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-xl text-xs font-semibold">Save Key</button>
+        <button onclick="saveApiKey()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-xl text-xs font-semibold">Save</button>
         <button onclick="closeModals()" class="px-3 py-2 text-xs font-medium text-slate-400">Cancel</button>
       </div>
     </div>
