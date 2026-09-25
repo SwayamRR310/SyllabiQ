@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SYLLABIQ PRODUCT OWNER (PO) DATA ENGINE
+   SYLLABIQ DATA ENGINE & APPLICATION CONTROLLER
    ========================================================================== */
 
 const DB_KEYS = {
@@ -109,7 +109,7 @@ const defaultPortions = {
   ]
 };
 
-// Initialize / Retrieve Dynamic Stores
+// Database Getter and Setter helpers
 function getCurriculumDB() {
   const data = localStorage.getItem(DB_KEYS.CURRICULUM);
   if (!data) {
@@ -149,7 +149,7 @@ function savePortionDB(data) {
   localStorage.setItem(DB_KEYS.PORTIONS, JSON.stringify(data));
 }
 
-// Runtime State
+// Runtime Global State
 let currentUser = null;
 let currentBoard = "CBSE 10th";
 let activeProgressSubject = "All";
@@ -162,7 +162,7 @@ let uploadedPdfName = null;
    APP INITIALIZATION
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
   initTheme();
   loadUserSession();
   renderBoard();
@@ -178,16 +178,25 @@ function setupEventListeners() {
   document.getElementById("authBtn").addEventListener("click", handleAuthBtnClick);
   document.getElementById("authToggleBtn").addEventListener("click", toggleAuthMode);
   document.getElementById("authForm").addEventListener("submit", handleAuthSubmit);
+  
   document.getElementById("apiKeyModalBtn").addEventListener("click", () => {
     document.getElementById("apiKeyInput").value = userApiKey;
     showModal("keyModal");
   });
-  document.getElementById("subjectFilter").addEventListener("change", (e) => renderPYQs(e.target.value));
-  document.getElementById("chatForm").addEventListener("submit", handleChatSubmit);
+
+  const subjectFilter = document.getElementById("subjectFilter");
+  if (subjectFilter) {
+    subjectFilter.addEventListener("change", (e) => renderPYQs(e.target.value));
+  }
+
+  const chatForm = document.getElementById("chatForm");
+  if (chatForm) {
+    chatForm.addEventListener("submit", handleChatSubmit);
+  }
 }
 
 /* ==========================================================================
-   AUTHENTICATION & ADMIN ACCESS
+   AUTHENTICATION & USER PROFILE
    ========================================================================== */
 function getLocalUsers() {
   return JSON.parse(localStorage.getItem(DB_KEYS.USERS) || "{}");
@@ -223,7 +232,6 @@ function updateAuthUI() {
     document.getElementById("statStreak").innerText = `${currentUser.streak || 1} Days`;
     document.getElementById("statDoubts").innerText = currentUser.doubtsCount || 0;
 
-    // Show Admin Portal Button if Admin
     if (currentUser.role === "admin") {
       adminBtn.classList.remove("hidden");
     } else {
@@ -366,7 +374,7 @@ function claimDailyStreak() {
 }
 
 /* ==========================================================================
-   PROGRESS TRACKING (DYNAMIC FOR ALL SUBJECTS)
+   PROGRESS TRACKING (DYNAMIC CHAPTERS & WEIGHTAGE)
    ========================================================================== */
 function renderProgressView() {
   const curriculumDB = getCurriculumDB();
@@ -374,6 +382,8 @@ function renderProgressView() {
   const subjects = Object.keys(curriculum);
 
   const pillContainer = document.getElementById("progressSubjectPills");
+  if (!pillContainer) return;
+
   if (subjects.length === 0) {
     pillContainer.innerHTML = `<span class="text-xs text-slate-400">No subjects configured for ${currentBoard} yet. (Add via Admin Portal)</span>`;
     document.getElementById("chapterChecklistContainer").innerHTML = "";
@@ -496,13 +506,16 @@ function renderPYQs(filter) {
   const allPyqs = getPYQDB();
   const boardPyqs = allPyqs.filter(q => !q.board || q.board === currentBoard);
 
-  // Update subject dropdown filter options
   const filterSelect = document.getElementById("subjectFilter");
-  const uniqueSubjects = [...new Set(boardPyqs.map(q => q.subject))];
-  filterSelect.innerHTML = `<option value="all">All Subjects</option>` + uniqueSubjects.map(s => `<option value="${s}">${s}</option>`).join("");
-  if (filter !== "all") filterSelect.value = filter;
+  if (filterSelect) {
+    const uniqueSubjects = [...new Set(boardPyqs.map(q => q.subject))];
+    filterSelect.innerHTML = `<option value="all">All Subjects</option>` + uniqueSubjects.map(s => `<option value="${s}">${s}</option>`).join("");
+    if (filter !== "all") filterSelect.value = filter;
+  }
 
   const container = document.getElementById("pyqContainer");
+  if (!container) return;
+
   const filtered = filter === "all" ? boardPyqs : boardPyqs.filter(q => q.subject.toLowerCase() === filter.toLowerCase());
 
   if (filtered.length === 0) {
@@ -529,6 +542,7 @@ function renderPortions() {
   const portionDB = getPortionDB();
   const list = portionDB[currentBoard] || [];
   const container = document.getElementById("portionCardList");
+  if (!container) return;
 
   if (list.length === 0) {
     container.innerHTML = `<div class="text-xs text-slate-400 p-4 text-center">No portion omissions registered for ${currentBoard}.</div>`;
@@ -557,7 +571,7 @@ function renderPortions() {
       ` : ''}
     </div>
   `).join("");
-  lucide.createIcons();
+  if (window.lucide) lucide.createIcons();
 }
 
 /* ==========================================================================
@@ -565,11 +579,16 @@ function renderPortions() {
    ========================================================================== */
 function switchAdminSection(section) {
   ["curriculum", "pyqs", "portion"].forEach(sec => {
-    document.getElementById(`adminSec-${sec}`).classList.add("hidden");
-    document.getElementById(`adminSecBtn-${sec}`).classList.remove("active");
+    const el = document.getElementById(`adminSec-${sec}`);
+    const btn = document.getElementById(`adminSecBtn-${sec}`);
+    if (el) el.classList.add("hidden");
+    if (btn) btn.classList.remove("active");
   });
-  document.getElementById(`adminSec-${section}`).classList.remove("hidden");
-  document.getElementById(`adminSecBtn-${section}`).classList.add("active");
+  
+  const targetEl = document.getElementById(`adminSec-${section}`);
+  const targetBtn = document.getElementById(`adminSecBtn-${section}`);
+  if (targetEl) targetEl.classList.remove("hidden");
+  if (targetBtn) targetBtn.classList.add("active");
 
   if (section === "curriculum") renderAdminCurriculum();
   if (section === "pyqs") renderAdminPYQs();
@@ -581,6 +600,7 @@ function renderAdminCurriculum() {
   const db = getCurriculumDB();
   const curriculum = db[currentBoard] || {};
   const container = document.getElementById("adminCurriculumTree");
+  if (!container) return;
 
   const subjects = Object.keys(curriculum);
   if (subjects.length === 0) {
@@ -678,17 +698,18 @@ function adminDeleteChapter(sub, chId) {
   }
 }
 
-// Admin PYQs
 function renderAdminPYQs() {
   const allPyqs = getPYQDB();
   const boardPyqs = allPyqs.filter(q => !q.board || q.board === currentBoard);
   const container = document.getElementById("adminPyqList");
+  if (!container) return;
 
-  // Populate Subject Select in Modal
   const db = getCurriculumDB();
   const subjects = Object.keys(db[currentBoard] || {});
   const pyqSubSelect = document.getElementById("newPyqSubject");
-  pyqSubSelect.innerHTML = subjects.map(s => `<option value="${s}">${s}</option>`).join("");
+  if (pyqSubSelect) {
+    pyqSubSelect.innerHTML = subjects.map(s => `<option value="${s}">${s}</option>`).join("");
+  }
 
   container.innerHTML = boardPyqs.map(q => `
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center justify-between text-xs">
@@ -737,7 +758,6 @@ function adminDeletePYQ(id) {
   renderPYQs("all");
 }
 
-// Admin Portion & PDF Uploader
 function previewPdfFileName(input) {
   const file = input.files[0];
   if (!file) return;
@@ -751,7 +771,6 @@ function previewPdfFileName(input) {
   uploadedPdfName = file.name;
   document.getElementById("pdfFileNameDisplay").innerText = `Selected: ${file.name}`;
 
-  // Read file into Data URL (Base64) to store directly in browser storage
   const reader = new FileReader();
   reader.onload = function(e) {
     uploadedPdfBase64 = e.target.result;
@@ -763,6 +782,7 @@ function renderAdminPortions() {
   const db = getPortionDB();
   const list = db[currentBoard] || [];
   const container = document.getElementById("adminPortionList");
+  if (!container) return;
 
   container.innerHTML = list.map(item => `
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center justify-between text-xs">
@@ -796,7 +816,6 @@ function adminSaveNewPortion() {
 
   savePortionDB(db);
 
-  // Clear fields
   document.getElementById("newPortionSubject").value = "";
   document.getElementById("newPortionNote").value = "";
   document.getElementById("newPortionPdfFile").value = "";
@@ -820,32 +839,47 @@ function adminDeletePortion(id) {
 }
 
 /* ==========================================================================
-   DOUBT SOLVER & NAVIGATION
+   TAB NAVIGATION (FIXED PRECISE MAP)
    ========================================================================== */
 function switchTab(tabId) {
-  const tabs = ["home", "progress", "ai", "pyqs", "portion", "admin"];
-  tabs.forEach(t => {
-    const view = document.getElementById("view" + capitalize(t));
-    if (view) view.classList.add("hidden");
-    const navBtn = document.querySelector(`[data-tab="${t}"]`);
-    if (navBtn) navBtn.classList.remove("active");
+  const tabMap = {
+    home: "viewHome",
+    progress: "viewProgress",
+    ai: "viewAI",
+    pyqs: "viewPYQs",
+    portion: "viewPortion",
+    admin: "viewAdmin"
+  };
+
+  // Hide all sections
+  Object.values(tabMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
   });
 
-  const activeView = document.getElementById("view" + capitalize(tabId));
-  if (activeView) activeView.classList.remove("hidden");
+  // Reset active classes on all nav buttons
+  document.querySelectorAll(".nav-tab").forEach(btn => {
+    btn.classList.remove("active");
+  });
 
+  // Display the target tab
+  const targetId = tabMap[tabId];
+  const targetEl = document.getElementById(targetId);
+  if (targetEl) {
+    targetEl.classList.remove("hidden");
+  }
+
+  // Set clicked tab to active
   const activeNav = document.querySelector(`[data-tab="${tabId}"]`);
-  if (activeNav) activeNav.classList.add("active");
+  if (activeNav) {
+    activeNav.classList.add("active");
+  }
 
   if (tabId === "admin") {
     switchAdminSection("curriculum");
   }
 
-  lucide.createIcons();
-}
-
-function capitalize(s) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  if (window.lucide) lucide.createIcons();
 }
 
 function selectBoard(boardName) {
@@ -862,11 +896,15 @@ function selectBoard(boardName) {
 }
 
 function renderBoard() {
-  document.getElementById("currentBoardLabel").innerText = currentBoard;
-  document.getElementById("chatBoardLabel").innerText = currentBoard;
+  const boardLabel = document.getElementById("currentBoardLabel");
+  const chatLabel = document.getElementById("chatBoardLabel");
+  if (boardLabel) boardLabel.innerText = currentBoard;
+  if (chatLabel) chatLabel.innerText = currentBoard;
 }
 
-// Low-Token AI
+/* ==========================================================================
+   LOW-TOKEN DOUBT SOLVER AI ENGINE
+   ========================================================================== */
 async function handleChatSubmit(e) {
   e.preventDefault();
   const input = document.getElementById("doubtInput");
@@ -886,7 +924,7 @@ async function handleChatSubmit(e) {
 
   try {
     let answerText = "";
-    if (userApiKey) {
+    if (userApiKey && userApiKey.trim().length > 10) {
       answerText = await callGemini(doubt);
     } else {
       await new Promise(r => setTimeout(r, 600));
@@ -894,31 +932,48 @@ async function handleChatSubmit(e) {
     }
     updateChatBubble(aiBubbleId, answerText);
   } catch (err) {
-    updateChatBubble(aiBubbleId, "Error connecting to AI: \n" + simulateStepSolution(doubt));
+    console.error("Gemini Error:", err);
+    updateChatBubble(aiBubbleId, `
+      <div class="text-amber-500 font-semibold mb-1 text-[11px]">API Key issue or offline. Here is the step format:</div>
+      ${simulateStepSolution(doubt)}
+    `);
   }
 }
 
 async function callGemini(doubt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${userApiKey.trim()}`;
+  
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: "You are a concise Board Exam Doubt Solver. Solve ONLY the doubt asked. Show: 1. Formula 2. Direct Substitution 3. Final boxed answer with SI units. Keep total response under 100 words. Zero chit-chat." }]
-      },
-      generationConfig: {
-        maxOutputTokens: 300,
-        temperature: 0.1
-      },
       contents: [{
-        parts: [{ text: `Target Board: ${currentBoard}. Doubt: ${doubt}` }]
-      }]
+        parts: [{ 
+          text: `Target Board: ${currentBoard}. Question: ${doubt}\n\nProvide the response strictly in this concise board exam format:\nStep 1: Formula / Concept\nStep 2: Substitution / Derivation\nFinal Boxed Answer: Result with units.` 
+        }]
+      }],
+      generationConfig: {
+        maxOutputTokens: 350,
+        temperature: 0.2
+      }
     })
   });
 
   const data = await response.json();
-  return data.candidates[0].content.parts[0].text;
+  if (data.error) {
+    throw new Error(data.error.message || "Failed to fetch response");
+  }
+
+  const rawText = data.candidates[0].content.parts[0].text;
+  return formatAiOutput(rawText);
+}
+
+function formatAiOutput(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/Step \d+.*?:/gi, match => `<div class="math-step"><strong>${match}</strong>`)
+    .replace(/Final (?:Boxed )?Answer.*?:/gi, match => `</div><div class="math-final"><strong>${match}</strong>`)
+    .replace(/\n\n/g, '<br/>') + '</div>';
 }
 
 function simulateStepSolution(doubt) {
@@ -957,10 +1012,16 @@ function updateChatBubble(id, text) {
 }
 
 function presetQuestion(q) {
-  document.getElementById("doubtInput").value = q;
-  document.getElementById("doubtInput").focus();
+  const input = document.getElementById("doubtInput");
+  if (input) {
+    input.value = q;
+    input.focus();
+  }
 }
 
+/* ==========================================================================
+   THEME, MODALS, AND UTILITY
+   ========================================================================== */
 function initTheme() {
   const isDark = localStorage.getItem(DB_KEYS.THEME) === "dark" || 
     (!localStorage.getItem(DB_KEYS.THEME) && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -973,18 +1034,24 @@ function toggleTheme() {
 }
 
 function showModal(id) {
-  document.getElementById(id).classList.remove("hidden");
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closeModals() {
-  document.getElementById("boardModal").classList.add("hidden");
-  document.getElementById("keyModal").classList.add("hidden");
-  document.getElementById("authModal").classList.add("hidden");
-  document.getElementById("profileModal").classList.add("hidden");
-  document.getElementById("addSubjectModal").classList.add("hidden");
-  document.getElementById("addChapterModal").classList.add("hidden");
-  document.getElementById("addPyqModal").classList.add("hidden");
-  document.getElementById("addPortionModal").classList.add("hidden");
+  [
+    "boardModal",
+    "keyModal",
+    "authModal",
+    "profileModal",
+    "addSubjectModal",
+    "addChapterModal",
+    "addPyqModal",
+    "addPortionModal"
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add("hidden");
+  });
 }
 
 function saveApiKey() {
