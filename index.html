@@ -1,852 +1,283 @@
 <!DOCTYPE html>
 <html lang="en" class="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#ffffff" />
-  <title>SyllabiQ • Board AI Study Companion</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SyllabiQ - Board Exam AI & PYQ Hub</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons CDN -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <!-- Google Fonts: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
           colors: {
-            brand: {
-              50: '#f5f3ff',
-              100: '#ede9fe',
-              500: '#8b5cf6',
-              600: '#7c3aed',
-              700: '#6d28d9',
-            },
-            accent: {
-              cyan: '#06b6d4',
-              violet: '#8b5cf6',
-              rose: '#f43f5e',
-            }
+            brand: { 50: '#f5f3ff', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9' }
           }
         }
       }
-    };
+    }
   </script>
 
-  <style>
-    /* Custom clean gradient aesthetics */
-    .bg-gradient-mesh {
-      background: radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-                  radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
-                  radial-gradient(at 50% 100%, rgba(244, 63, 94, 0.04) 0px, transparent 50%);
-    }
-    .dark .bg-gradient-mesh {
-      background: radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-                  radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-                  radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%);
-    }
-
-    .hero-gradient {
-      background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #06b6d4 100%);
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-    .dark .glass-card {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    .touch-btn:active {
-      transform: scale(0.97);
-      transition: transform 0.1s ease;
-    }
-  </style>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200 antialiased bg-gradient-mesh pb-20 md:pb-6">
-
-  <!-- Top Glass Bar -->
-  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 transition-colors">
-    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-      
-      <!-- Brand & Board Selector -->
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl hero-gradient flex items-center justify-center text-white shadow-md shadow-violet-500/20">
-          <i class="ph-bold ph-lightning text-lg"></i>
+  <!-- Top App Navigation -->
+  <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-md shadow-violet-500/20 text-white">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
-            <h1 class="font-extrabold text-sm sm:text-base tracking-tight bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
-              SyllabiQ
-            </h1>
-            <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-violet-100 dark:bg-violet-950/80 text-violet-700 dark:text-violet-300">
-              Low-Token AI
-            </span>
-          </div>
-          <!-- Current Board Selector Dropdown -->
-          <div class="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 font-semibold cursor-pointer">
-            <select id="boardSelect" onchange="onBoardChange(this.value)" class="bg-transparent border-none text-[11px] font-bold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer p-0 pr-1">
-              <option value="CBSE-10">CBSE Class 10</option>
-              <option value="CBSE-12">CBSE Class 12</option>
-              <option value="ICSE-10">ICSE Class 10</option>
-              <option value="MH_SSC-10">MH SSC (Class 10)</option>
-              <option value="MH_HSC-12">MH HSC (Class 12)</option>
-            </select>
-          </div>
+          <span class="font-extrabold text-base tracking-tight bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">SyllabiQ</span>
+          <span class="text-[10px] block font-semibold text-slate-400 uppercase tracking-wider">Board AI Hub</span>
         </div>
       </div>
 
-      <!-- Quick Actions: Streak, API Key Config, Dark Mode -->
       <div class="flex items-center gap-2">
-        
-        <!-- Live Streak Pill -->
-        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-900/60 text-amber-700 dark:text-amber-400 text-xs font-bold">
-          <i class="ph-fill ph-fire text-amber-500 text-sm animate-pulse"></i>
-          <span id="streakDisplay">12d Streak</span>
-        </div>
-
-        <!-- API Key Configure Button -->
-        <button onclick="openKeyModal()" class="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 touch-btn border border-slate-200/60 dark:border-slate-800" title="Set Gemini API Key">
-          <i class="ph-bold ph-key text-base"></i>
+        <!-- Board Pill -->
+        <button id="boardSelectorBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+          <span id="currentBoardLabel">CBSE 10th</span>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
         </button>
 
-        <!-- Dark Mode Toggle Button -->
-        <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 touch-btn border border-slate-200/60 dark:border-slate-800" title="Toggle Theme">
-          <i id="themeIcon" class="ph-bold ph-moon text-base"></i>
+        <!-- API Key Manager -->
+        <button id="apiKeyModalBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Set Gemini API Key">
+          <i data-lucide="key" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Toggle Theme">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-600"></i>
         </button>
       </div>
-
     </div>
   </header>
 
-  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-5 space-y-5">
-    
-    <!-- Aesthetic Tab Bar (Desktop & Tablet) -->
-    <div class="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800/80 pb-2">
-      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-        <button onclick="setActiveTab('solver')" id="tabBtn-solver" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all bg-violet-600 text-white shadow-sm shadow-violet-500/20">
-          <i class="ph-bold ph-chat-teardrop-dots text-base"></i>
-          <span>Doubt AI Solver</span>
-        </button>
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 pb-28">
 
-        <button onclick="setActiveTab('pyqs')" id="tabBtn-pyqs" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/60 transition-all">
-          <i class="ph-bold ph-fire text-base"></i>
-          <span>Frequent PYQs</span>
-        </button>
-
-        <button onclick="setActiveTab('portions')" id="tabBtn-portions" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/60 transition-all">
-          <i class="ph-bold ph-bookmark-simple text-base"></i>
-          <span>Portion Watchdog</span>
-        </button>
-
-        <button onclick="setActiveTab('progress')" id="tabBtn-progress" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/60 transition-all">
-          <i class="ph-bold ph-chart-line-up text-base"></i>
-          <span>Prep Tracker</span>
-        </button>
-      </div>
-
-      <!-- Quick AI Status Badge -->
-      <div class="hidden sm:flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span id="aiStatusText">Free Simulator Ready</span>
-      </div>
-    </div>
-
-    <section id="tab-solver" class="space-y-4">
-      
-      <!-- Gradient Hero Banner -->
-      <div class="relative overflow-hidden rounded-3xl p-5 sm:p-6 text-white hero-gradient shadow-lg shadow-violet-500/15">
-        <div class="relative z-10 max-w-xl space-y-2">
-          <span class="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full">
-            <i class="ph-fill ph-sparkle text-amber-300"></i> Board Marking Scheme AI
-          </span>
-          <h2 class="text-xl sm:text-2xl font-black tracking-tight leading-tight">
-            Solve math and concept doubts without word fluff.
-          </h2>
-          <p class="text-xs sm:text-sm text-violet-100 font-medium">
-            Strict token optimizer: answers are kept under 150-200 words with exact steps: <code class="bg-black/20 px-1.5 py-0.5 rounded text-[11px] font-mono">Formula → Steps → Boxed Answer</code>.
+    <!-- TAB 1: HOME DASHBOARD -->
+    <section id="viewHome" class="space-y-5">
+      <!-- Portion Alert Banner -->
+      <div id="portionNotice" class="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+        </div>
+        <div class="flex-1 text-xs">
+          <h4 class="font-bold text-slate-900 dark:text-white">Portion Watchdog Active</h4>
+          <p class="text-slate-600 dark:text-slate-400 mt-0.5" id="portionNoticeText">
+            Rationalized NCERT updates synced. Outdated questions are automatically flagged.
           </p>
         </div>
-        <div class="absolute -right-4 -bottom-8 opacity-10 text-white text-9xl pointer-events-none">
-          <i class="ph-bold ph-graduation-cap"></i>
+      </div>
+
+      <!-- Quick Stats Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-orange-100 dark:bg-orange-950/60 text-orange-600 flex items-center justify-center font-bold">
+            🔥
+          </div>
+          <div>
+            <div class="text-lg font-extrabold" id="streakDays">6 Days</div>
+            <div class="text-[11px] text-slate-500 font-medium">Daily Streak</div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-950/60 text-violet-600 flex items-center justify-center">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-lg font-extrabold">88.4%</div>
+            <div class="text-[11px] text-slate-500 font-medium">Portion Synced</div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 flex items-center justify-center">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-lg font-extrabold">142</div>
+            <div class="text-[11px] text-slate-500 font-medium">High-Yield PYQs</div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="target" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-lg font-extrabold">95%+</div>
+            <div class="text-[11px] text-slate-500 font-medium">Goal Tier</div>
+          </div>
         </div>
       </div>
 
-      <!-- Chat Screen Card -->
-      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm flex flex-col h-[520px]">
-        
-        <!-- Chat Header -->
-        <div class="px-4 py-3 bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
+      <!-- Quick Action Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div onclick="switchTab('ai')" class="cursor-pointer bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-2xl p-5 shadow-lg shadow-violet-500/15 relative overflow-hidden group">
+          <div class="relative z-10">
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase bg-white/20 px-2 py-0.5 rounded-full mb-2">Instant Stepwise Help</span>
+            <h3 class="text-lg font-bold">Ask Doubt Solver AI</h3>
+            <p class="text-violet-100 text-xs mt-1">Get instant board-marking step solutions with zero token bloat.</p>
+          </div>
+          <i data-lucide="sparkles" class="w-20 h-20 text-white/10 absolute -right-2 -bottom-2 group-hover:scale-110 transition-transform"></i>
+        </div>
+
+        <div onclick="switchTab('pyqs')" class="cursor-pointer bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:border-violet-500/40 transition group">
+          <span class="inline-flex items-center gap-1 text-[11px] font-bold tracking-wider uppercase text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full mb-2">Priority Questions</span>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Frequent PYQ Vault</h3>
+          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Sorted strictly by frequency of recurrence in past 10 years.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: DOUBT SOLVER AI -->
+    <section id="viewAI" class="hidden space-y-4">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
           <div class="flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
-            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Doubt Assistant (<span id="chatBoardLabel">CBSE 10</span>)</span>
+            <div class="w-8 h-8 rounded-lg bg-violet-600/10 text-violet-600 dark:text-violet-400 flex items-center justify-center">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm">Exam Doubt AI</h3>
+              <p class="text-[11px] text-slate-400">Strict low-token mode · Stepwise board answers</p>
+            </div>
           </div>
-          <button onclick="clearChat()" class="text-xs text-slate-400 hover:text-rose-500 font-bold flex items-center gap-1 touch-btn">
-            <i class="ph-bold ph-arrow-counter-clockwise"></i> Clear
-          </button>
+          <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">Token Saver Active</span>
         </div>
 
-        <!-- Chat Conversation Area -->
-        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3.5 no-scrollbar">
-          
-          <!-- Default Bot Greeting -->
+        <!-- Chat Log -->
+        <div id="chatLog" class="py-4 space-y-3 min-h-[280px] max-h-[380px] overflow-y-auto">
           <div class="flex items-start gap-2.5">
-            <div class="w-8 h-8 rounded-xl hero-gradient text-white flex items-center justify-center text-sm flex-shrink-0 shadow-sm">
-              <i class="ph-bold ph-robot"></i>
-            </div>
-            <div class="max-w-[85%] bg-slate-100 dark:bg-slate-800/80 rounded-2xl rounded-tl-none p-3.5 text-xs sm:text-sm text-slate-700 dark:text-slate-200 space-y-1.5 border border-slate-200/50 dark:border-slate-700/60 leading-relaxed">
-              <p class="font-bold text-slate-900 dark:text-white">Ask your doubt directly.</p>
-              <p>Type a derivation, formula question, or calculation. I will answer strictly with step marks and zero unnecessary chat.</p>
+            <div class="w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs shrink-0">AI</div>
+            <div class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-3 rounded-2xl rounded-tl-sm max-w-[85%]">
+              Hello! Drop any exam numerical, reaction, or concept question. I solve strictly according to step-marking criteria.
             </div>
           </div>
-
         </div>
 
-        <!-- Fast Question Quick-Chips -->
-        <div class="p-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-t border-slate-200/60 dark:border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <button onclick="askPreset('Calculate equivalent resistance for two 6 ohm resistors in parallel')" class="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-violet-500 text-slate-600 dark:text-slate-300 whitespace-nowrap touch-btn">
-            ⚡ Resistors in Parallel
-          </button>
-          <button onclick="askPreset('Prove that root 5 is an irrational number')" class="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-violet-500 text-slate-600 dark:text-slate-300 whitespace-nowrap touch-btn">
-            📐 Prove √5 Irrational
-          </button>
-          <button onclick="askPreset('State Snell\'s law of refraction and write its mathematical formula')" class="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-violet-500 text-slate-600 dark:text-slate-300 whitespace-nowrap touch-btn">
-            🔍 Snell's Law
-          </button>
-          <button onclick="askPreset('Balance this: Fe + H2O -> Fe3O4 + H2')" class="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-violet-500 text-slate-600 dark:text-slate-300 whitespace-nowrap touch-btn">
-            🧪 Balance Fe + H2O
-          </button>
+        <!-- Chips -->
+        <div class="flex gap-1.5 overflow-x-auto py-2 no-scrollbar border-t border-slate-100 dark:border-slate-800">
+          <button onclick="presetQuestion('Find focal length of convex lens with power +2.5 D with steps')" class="chip">Convex Lens Power</button>
+          <button onclick="presetQuestion('State Ohm\'s Law and write formula with SI units')" class="chip">Ohm's Law</button>
+          <button onclick="presetQuestion('Balance: Fe + H2O -> Fe3O4 + H2 with steps')" class="chip">Balance Reaction</button>
         </div>
 
-        <!-- Chat Input Form -->
-        <form id="doubtForm" onsubmit="handleSendDoubt(event)" class="p-3 bg-white dark:bg-slate-900 border-t border-slate-200/70 dark:border-slate-800 flex items-center gap-2">
-          <input 
-            type="text" 
-            id="doubtInput" 
-            placeholder="Type your exam question or math problem..." 
-            class="flex-1 bg-slate-100 dark:bg-slate-800 text-xs sm:text-sm px-4 py-3 rounded-2xl border border-transparent focus:border-violet-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition-all"
-            required
-            autocomplete="off"
-          />
-          <button 
-            type="submit" 
-            id="sendDoubtBtn" 
-            class="w-11 h-11 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white flex items-center justify-center touch-btn shadow-md shadow-violet-500/30 flex-shrink-0"
-          >
-            <i class="ph-bold ph-paper-plane-right text-base"></i>
+        <!-- Input Box -->
+        <form id="chatForm" class="flex gap-2 pt-2">
+          <input type="text" id="doubtInput" placeholder="Ask a doubt or paste numerical..." class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500" required>
+          <button type="submit" id="sendBtn" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition">
+            <span>Solve</span>
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
           </button>
         </form>
-
       </div>
-
     </section>
 
-    <section id="tab-pyqs" class="hidden space-y-4">
-      
-      <!-- Subject Filter Pills -->
-      <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-        <div class="flex items-center gap-2">
-          <button onclick="filterPYQs('all')" class="pyq-chip active px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-violet-600 text-white">All</button>
-          <button onclick="filterPYQs('Physics')" class="pyq-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">Physics</button>
-          <button onclick="filterPYQs('Mathematics')" class="pyq-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">Maths</button>
-          <button onclick="filterPYQs('Chemistry')" class="pyq-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">Chemistry</button>
-        </div>
-
-        <span class="text-xs font-bold text-slate-400 whitespace-nowrap">Sorted by Frequency</span>
-      </div>
-
-      <!-- PYQ List Container -->
-      <div id="pyqListContainer" class="space-y-3">
-        <!-- Injected via JavaScript -->
-      </div>
-
-    </section>
-
-    <section id="tab-portions" class="hidden space-y-4">
-      
-      <!-- Alert Banner -->
-      <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/60 flex items-start gap-3">
-        <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <i class="ph-bold ph-shield-warning text-lg"></i>
-        </div>
+    <!-- TAB 3: HIGH-FREQUENCY PYQs -->
+    <section id="viewPYQs" class="hidden space-y-4">
+      <div class="flex items-center justify-between">
         <div>
-          <h4 class="font-bold text-xs sm:text-sm text-amber-900 dark:text-amber-300">Live Portion Watchdog (2024-26)</h4>
-          <p class="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-            Portions deleted by the board are marked with red tags so you don't waste time solving obsolete questions.
-          </p>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Frequent Board PYQs</h2>
+          <p class="text-xs text-slate-500">Sorted by past board recurrence rate</p>
         </div>
+        <select id="subjectFilter" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2.5 py-1.5 font-medium">
+          <option value="all">All Subjects</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+          <option value="Mathematics">Mathematics</option>
+        </select>
       </div>
 
-      <!-- Syllabus Topics Cards Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5" id="portionsGrid">
-        <!-- Injected via JS -->
+      <!-- Question List -->
+      <div id="pyqContainer" class="space-y-3">
+        <!-- Rendered via app.js -->
       </div>
-
     </section>
 
-    <section id="tab-progress" class="hidden space-y-4">
-      
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        
-        <!-- Streak Card -->
-        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider">Current Streak</span>
-            <i class="ph-fill ph-fire text-amber-500 text-lg"></i>
-          </div>
-          <p class="text-2xl sm:text-3xl font-black text-amber-500">12 Days</p>
-          <p class="text-xs text-slate-500">Solve at least 2 PYQs daily to sustain bonus multiplier.</p>
-        </div>
-
-        <!-- Target Accuracy Card -->
-        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider">Board Target</span>
-            <i class="ph-bold ph-target text-violet-500 text-lg"></i>
-          </div>
-          <p class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white">95%</p>
-          <p class="text-xs text-slate-500">Current mock score estimate: <strong>81.5%</strong></p>
-        </div>
-
-        <!-- High-Yield PYQs Solved -->
-        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider">Recurring Solved</span>
-            <i class="ph-bold ph-seal-check text-emerald-500 text-lg"></i>
-          </div>
-          <p class="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">46 / 60</p>
-          <p class="text-xs text-slate-500">Top repeated board questions mastered.</p>
-        </div>
-
+    <!-- TAB 4: PORTION UPDATES -->
+    <section id="viewPortion" class="hidden space-y-4">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Rationalized Portion Tracker</h2>
+        <p class="text-xs text-slate-500">Verified official changes for 2025-2026 Academic Year</p>
       </div>
 
-      <!-- Quick Mock Score Logger -->
-      <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
-        <h3 class="font-extrabold text-sm text-slate-800 dark:text-white flex items-center gap-2">
-          <i class="ph-bold ph-pencil-simple text-violet-600"></i> Log Recent Mock Score
-        </h3>
-        <form onsubmit="handleMockLog(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
-          <select id="logSubject" class="bg-slate-100 dark:bg-slate-800 text-xs font-semibold p-2.5 rounded-xl border border-transparent focus:border-violet-500">
-            <option value="Mathematics">Mathematics</option>
-            <option value="Physics">Physics</option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Biology">Biology</option>
-          </select>
-          <input type="number" id="logMarks" min="0" max="100" placeholder="Score (e.g. 74)" required class="bg-slate-100 dark:bg-slate-800 text-xs font-semibold p-2.5 rounded-xl border border-transparent focus:border-violet-500" />
-          <input type="number" id="logTotal" value="80" placeholder="Total (80 or 100)" class="bg-slate-100 dark:bg-slate-800 text-xs font-semibold p-2.5 rounded-xl border border-transparent focus:border-violet-500" />
-          <button type="submit" class="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs p-2.5 rounded-xl touch-btn shadow-sm">
-            Save & Update
-          </button>
-        </form>
+      <div id="portionCardList" class="space-y-3">
+        <!-- Rendered via app.js -->
       </div>
-
     </section>
 
   </main>
 
-  <nav class="fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200/80 dark:border-slate-800 md:hidden shadow-lg shadow-black/5">
-    <div class="max-w-md mx-auto px-4 py-2 flex items-center justify-around">
-      <button onclick="setActiveTab('solver')" id="mobNav-solver" class="mob-nav-btn active flex flex-col items-center text-violet-600 dark:text-violet-400">
-        <i class="ph-bold ph-chat-teardrop-dots text-xl"></i>
-        <span class="text-[10px] font-bold mt-0.5">Doubt AI</span>
+  <!-- Bottom Navigation Bar -->
+  <nav class="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-40">
+    <div class="max-w-md mx-auto grid grid-cols-4 h-16">
+      <button onclick="switchTab('home')" class="nav-tab active flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="home">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1 font-semibold">Home</span>
       </button>
 
-      <button onclick="setActiveTab('pyqs')" id="mobNav-pyqs" class="mob-nav-btn flex flex-col items-center text-slate-400">
-        <i class="ph-bold ph-fire text-xl"></i>
-        <span class="text-[10px] font-bold mt-0.5">PYQs</span>
+      <button onclick="switchTab('ai')" class="nav-tab flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="ai">
+        <i data-lucide="sparkles" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1 font-semibold">Doubt AI</span>
       </button>
 
-      <button onclick="setActiveTab('portions')" id="mobNav-portions" class="mob-nav-btn flex flex-col items-center text-slate-400">
-        <i class="ph-bold ph-bookmark-simple text-xl"></i>
-        <span class="text-[10px] font-bold mt-0.5">Portions</span>
+      <button onclick="switchTab('pyqs')" class="nav-tab flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="pyqs">
+        <i data-lucide="flame" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1 font-semibold">PYQs</span>
       </button>
 
-      <button onclick="setActiveTab('progress')" id="mobNav-progress" class="mob-nav-btn flex flex-col items-center text-slate-400">
-        <i class="ph-bold ph-chart-line-up text-xl"></i>
-        <span class="text-[10px] font-bold mt-0.5">Streak</span>
+      <button onclick="switchTab('portion')" class="nav-tab flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="portion">
+        <i data-lucide="book-open" class="w-5 h-5"></i>
+        <span class="text-[10px] mt-1 font-semibold">Portion</span>
       </button>
     </div>
   </nav>
 
-  <div id="keyModal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-            <i class="ph-bold ph-key text-base"></i>
-          </div>
-          <h3 class="font-extrabold text-sm text-slate-800 dark:text-white">Gemini API Key</h3>
-        </div>
-        <button onclick="closeKeyModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white touch-btn">
-          <i class="ph-bold ph-x text-base"></i>
-        </button>
+  <!-- Modal: Board Selection -->
+  <div id="boardModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Select Your Examination Board</h3>
+      <div class="space-y-2">
+        <button onclick="selectBoard('CBSE 10th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">CBSE Class 10</button>
+        <button onclick="selectBoard('CBSE 12th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">CBSE Class 12</button>
+        <button onclick="selectBoard('ICSE 10th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">ICSE Class 10</button>
+        <button onclick="selectBoard('MH SSC 10th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">Maharashtra SSC 10th</button>
+        <button onclick="selectBoard('MH HSC 12th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">Maharashtra HSC 12th</button>
       </div>
+      <button onclick="closeModals()" class="w-full py-2 text-xs font-medium text-slate-400 hover:text-slate-600">Close</button>
+    </div>
+  </div>
 
-      <p class="text-xs text-slate-500 dark:text-slate-400">
-        Paste your Google Gemini API key to enable live AI responses. Keys are saved strictly in your local browser's <code class="font-mono">localStorage</code>.
-      </p>
-
-      <input 
-        type="password" 
-        id="apiKeyInput" 
-        placeholder="AIzaSy..." 
-        class="w-full bg-slate-100 dark:bg-slate-800 text-xs px-3.5 py-2.5 rounded-xl border border-transparent focus:border-violet-500 focus:outline-none font-mono"
-      />
-
-      <div class="flex items-center gap-2">
-        <button onclick="saveApiKey()" class="flex-1 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs touch-btn">
-          Save Key
-        </button>
-        <button onclick="clearApiKey()" class="px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-xs touch-btn">
-          Use Offline Mode
-        </button>
+  <!-- Modal: API Key -->
+  <div id="keyModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
+      <div>
+        <h3 class="font-bold text-sm text-slate-900 dark:text-white">Gemini API Configuration</h3>
+        <p class="text-xs text-slate-400 mt-1">Saved securely in browser local storage.</p>
+      </div>
+      <input type="password" id="apiKeyInput" placeholder="Paste AI Studio API Key..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-violet-500 outline-none">
+      <div class="flex gap-2">
+        <button onclick="saveApiKey()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-xl text-xs font-semibold">Save Key</button>
+        <button onclick="closeModals()" class="px-3 py-2 text-xs font-medium text-slate-400">Cancel</button>
       </div>
     </div>
   </div>
 
-  <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 transform -translate-y-10 opacity-0 transition-all duration-200 pointer-events-none px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-semibold shadow-xl border border-slate-700 flex items-center gap-2">
-    <i class="ph-bold ph-check text-emerald-400"></i>
-    <span id="toastText">Done</span>
-  </div>
-
-  <script>
-    // State storage
-    const state = {
-      activeTab: 'solver',
-      currentBoard: 'CBSE-10',
-      apiKey: localStorage.getItem('syllabiq_gemini_key') || '',
-      streak: 12,
-      pyqs: [
-        {
-          id: 1,
-          subject: 'Physics',
-          question: "Calculate equivalent resistance when two resistors of 6Ω are connected in (a) Series, (b) Parallel.",
-          marks: 3,
-          freq: 6,
-          years: ['2020', '2022', '2023', '2024'],
-          isDeleted: false,
-          answer: "Series: R = R1 + R2 = 6 + 6 = 12Ω [1M]\nParallel: 1/R = 1/6 + 1/6 = 2/6 => R = 3Ω [1.5M]\nBoxed Units: [0.5M]"
-        },
-        {
-          id: 2,
-          subject: 'Mathematics',
-          question: "Prove that √5 is an irrational number by contradiction method.",
-          marks: 3,
-          freq: 7,
-          years: ['2018', '2019', '2020', '2023', '2024'],
-          isDeleted: false,
-          answer: "Assume √5 = a/b (co-prime, b≠0) [0.5M]\n5b² = a² => 5 divides a² => 5 divides a [1M]\nLet a = 5c => 5b² = 25c² => b² = 5c² => 5 divides b [1M]\nContradiction to co-prime proven [0.5M]"
-        },
-        {
-          id: 3,
-          subject: 'Chemistry',
-          question: "Write balanced chemical reaction for thermal decomposition of Lead Nitrate.",
-          marks: 2,
-          freq: 5,
-          years: ['2019', '2021', '2023'],
-          isDeleted: false,
-          answer: "2Pb(NO3)2(s) --Δ--> 2PbO(s) + 4NO2(g) + O2(g) [2M]\n(Note: Brown fumes = NO2)"
-        },
-        {
-          id: 4,
-          subject: 'Mathematics',
-          question: "Find the HCF of 135 and 225 using Euclid's Division Lemma.",
-          marks: 2,
-          freq: 4,
-          years: ['2017', '2018', '2019'],
-          isDeleted: true,
-          answer: "⚠️ OMITTED/RATIONALIZED TOPIC. Do not waste study hours on Euclid Division Lemma."
-        }
-      ],
-      portions: [
-        {
-          subject: 'Mathematics',
-          chapter: 'Real Numbers',
-          status: 'Omitted Subtopic',
-          badge: 'rose',
-          note: "Euclid's division lemma omitted from portion. Focus strictly on Fundamental Theorem of Arithmetic & Proof of Irrationality."
-        },
-        {
-          subject: 'Physics',
-          chapter: 'Light: Reflection & Refraction',
-          status: 'Guaranteed 10 Marks',
-          badge: 'emerald',
-          note: 'Mirror/Lens formula, Cartesian sign conventions, ray diagrams of Concave mirror and Convex lens.'
-        },
-        {
-          subject: 'Chemistry',
-          chapter: 'Periodic Classification',
-          status: 'Fully Excised (0 Marks)',
-          badge: 'rose',
-          note: 'Entire chapter deleted from 2024-26 NCERT rationalized edition. Skip totally.'
-        },
-        {
-          subject: 'Chemistry',
-          chapter: 'Chemical Reactions & Equations',
-          status: 'Active (6 Marks)',
-          badge: 'emerald',
-          note: 'Balancing equations, combination, decomposition, displacement, and redox reactions.'
-        }
-      ]
-    };
-
-    // Dark Mode Initialization
-    function initTheme() {
-      const isDark = localStorage.getItem('theme') === 'dark' || 
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-        document.getElementById('themeIcon').className = 'ph-bold ph-sun text-base text-amber-400';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.getElementById('themeIcon').className = 'ph-bold ph-moon text-base text-slate-500';
-      }
-    }
-
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      document.getElementById('themeIcon').className = isDark 
-        ? 'ph-bold ph-sun text-base text-amber-400' 
-        : 'ph-bold ph-moon text-base text-slate-500';
-      showToast(isDark ? 'Dark mode enabled' : 'Light mode enabled');
-    }
-
-    // Tab Switching
-    function setActiveTab(tab) {
-      state.activeTab = tab;
-      ['solver', 'pyqs', 'portions', 'progress'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
-        
-        // Desktop Tabs
-        const btn = document.getElementById(`tabBtn-${t}`);
-        if (btn) {
-          if (t === tab) {
-            btn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold flex items-center gap-2 transition-all bg-violet-600 text-white shadow-sm shadow-violet-500/20";
-          } else {
-            btn.className = "tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/60 transition-all";
-          }
-        }
-
-        // Mobile Nav
-        const mobBtn = document.getElementById(`mobNav-${t}`);
-        if (mobBtn) {
-          if (t === tab) {
-            mobBtn.className = "mob-nav-btn active flex flex-col items-center text-violet-600 dark:text-violet-400";
-          } else {
-            mobBtn.className = "mob-nav-btn flex flex-col items-center text-slate-400";
-          }
-        }
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Board Switcher
-    function onBoardChange(newBoard) {
-      state.currentBoard = newBoard;
-      document.getElementById('chatBoardLabel').textContent = newBoard.replace('_', ' ');
-      showToast(`Active Board set to ${newBoard}`);
-    }
-
-    // Modal Handlers
-    function openKeyModal() {
-      document.getElementById('apiKeyInput').value = state.apiKey;
-      document.getElementById('keyModal').classList.remove('hidden');
-    }
-
-    function closeKeyModal() {
-      document.getElementById('keyModal').classList.add('hidden');
-    }
-
-    function saveApiKey() {
-      const val = document.getElementById('apiKeyInput').value.trim();
-      state.apiKey = val;
-      localStorage.setItem('syllabiq_gemini_key', val);
-      updateAiStatus();
-      closeKeyModal();
-      showToast(val ? 'Gemini API Key Saved!' : 'Offline Mode Active');
-    }
-
-    function clearApiKey() {
-      state.apiKey = '';
-      localStorage.removeItem('syllabiq_gemini_key');
-      updateAiStatus();
-      closeKeyModal();
-      showToast('Switched to Intelligent Offline Mode');
-    }
-
-    function updateAiStatus() {
-      const statusEl = document.getElementById('aiStatusText');
-      if (state.apiKey) {
-        statusEl.textContent = 'Gemini Live (Low Tokens)';
-      } else {
-        statusEl.textContent = 'Smart Offline Mode';
-      }
-    }
-
-    // Doubt Handling & Low-Token API Prompt
-    function askPreset(text) {
-      document.getElementById('doubtInput').value = text;
-      handleSendDoubt(new Event('submit'));
-    }
-
-    async function handleSendDoubt(e) {
-      if (e) e.preventDefault();
-      const input = document.getElementById('doubtInput');
-      const question = input.value.trim();
-      if (!question) return;
-
-      const chatBox = document.getElementById('chatMessages');
-      const sendBtn = document.getElementById('sendDoubtBtn');
-
-      // User Message bubble
-      chatBox.innerHTML += `
-        <div class="flex items-start justify-end gap-2">
-          <div class="max-w-[85%] bg-violet-600 text-white rounded-2xl rounded-tr-none px-3.5 py-2.5 text-xs sm:text-sm font-medium shadow-sm">
-            ${escapeHtml(question)}
-          </div>
-        </div>
-      `;
-      input.value = '';
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      // Loading Indicator
-      const loadingId = 'loading-' + Date.now();
-      chatBox.innerHTML += `
-        <div id="${loadingId}" class="flex items-start gap-2.5">
-          <div class="w-8 h-8 rounded-xl hero-gradient text-white flex items-center justify-center text-xs flex-shrink-0 animate-pulse">
-            <i class="ph-bold ph-sparkle"></i>
-          </div>
-          <div class="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2.5 text-xs text-slate-500 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-violet-500 animate-ping"></span>
-            <span>Calculating step breakdown...</span>
-          </div>
-        </div>
-      `;
-      chatBox.scrollTop = chatBox.scrollHeight;
-      sendBtn.disabled = true;
-
-      try {
-        const solution = await requestLowTokenSolution(question, state.currentBoard);
-        document.getElementById(loadingId)?.remove();
-
-        chatBox.innerHTML += `
-          <div class="flex items-start gap-2.5">
-            <div class="w-8 h-8 rounded-xl hero-gradient text-white flex items-center justify-center text-sm flex-shrink-0 shadow-sm">
-              <i class="ph-bold ph-check"></i>
-            </div>
-            <div class="max-w-[88%] bg-white dark:bg-slate-800 rounded-2xl rounded-tl-none p-3.5 text-xs sm:text-sm border border-slate-200/80 dark:border-slate-700/80 shadow-sm text-slate-800 dark:text-slate-100 space-y-2 leading-relaxed">
-              <div class="flex items-center justify-between text-[11px] font-bold text-violet-600 dark:text-violet-400 border-b border-slate-100 dark:border-slate-700/60 pb-1">
-                <span>Step Marks Solution</span>
-                <span class="text-[10px] text-slate-400 font-mono">Max 150w</span>
-              </div>
-              <div class="whitespace-pre-line font-mono text-[11px] sm:text-xs">
-                ${escapeHtml(solution)}
-              </div>
-            </div>
-          </div>
-        `;
-        chatBox.scrollTop = chatBox.scrollHeight;
-      } catch (err) {
-        document.getElementById(loadingId)?.remove();
-        showToast('Error getting answer', 'ph-warning');
-      } finally {
-        sendBtn.disabled = false;
-      }
-    }
-
-    // Token-Constrained Gemini Request
-    async function requestLowTokenSolution(doubt, board) {
-      if (!state.apiKey) {
-        // Return quick instant simulated solution to save API calls
-        return simulateConciseAnswer(doubt);
-      }
-
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${state.apiKey}`;
-
-      const payload = {
-        systemInstruction: {
-          parts: [{
-            text: "You are a strict Board Exam Doubt Solver. Solve ONLY the doubt asked. No conversational filler or chit-chat. For math/numerical problems: Step 1 Formula, Step 2 Working, Step 3 Final answer in box with units. Maximum 150 words."
-          }]
-        },
-        generationConfig: {
-          maxOutputTokens: 350, // Strict low-token budget
-          temperature: 0.2
-        },
-        contents: [{
-          parts: [{ text: `Target Board: ${board}. Question: ${doubt}` }]
-        }]
-      };
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error("API call failed");
-      const data = await res.json();
-      return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No solution returned.";
-    }
-
-    function simulateConciseAnswer(q) {
-      const lower = q.toLowerCase();
-      if (lower.includes('parallel') || lower.includes('resistor')) {
-        return `[Step 1: Formula - 1 Mark]
-1/Req = 1/R1 + 1/R2
-
-[Step 2: Substitution - 1 Mark]
-1/Req = 1/6 + 1/6 = 2/6 = 1/3
-
-[Step 3: Boxed Answer - 1 Mark]
-┌─────────────┐
-│ Req = 3.0 Ω │
-└─────────────┘`;
-      }
-
-      if (lower.includes('root 5') || lower.includes('irrational')) {
-        return `[Proof by Contradiction - 3 Marks]
-1. Assume √5 = a/b (a, b are co-prime integers, b ≠ 0). [0.5M]
-2. 5b² = a² => 5 divides a² => 5 divides a. [1M]
-3. Let a = 5k => 5b² = 25k² => b² = 5k² => 5 divides b. [1M]
-4. Since both a & b share factor 5, it contradicts that a, b are co-prime.
-┌─────────────────────────┐
-│ Hence, √5 is irrational │
-└─────────────────────────┘ [0.5M]`;
-      }
-
-      return `[Board Stepwise Marking]
-1. Formula: State principle or formula first. [1 Mark]
-2. Working: Substitute values with signs. [1 Mark]
-3. Final: Express with SI unit. [1 Mark]
-┌─────────────────────────────────┐
-│ Solved according to board specs │
-└─────────────────────────────────┘`;
-    }
-
-    // Render PYQs
-    function filterPYQs(sub) {
-      document.querySelectorAll('.pyq-chip').forEach(c => {
-        c.className = "pyq-chip px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800";
-      });
-      event.target.className = "pyq-chip active px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-violet-600 text-white";
-
-      renderPYQs(sub);
-    }
-
-    function renderPYQs(filterSub = 'all') {
-      const container = document.getElementById('pyqListContainer');
-      const filtered = state.pyqs.filter(p => filterSub === 'all' || p.subject === filterSub);
-
-      container.innerHTML = filtered.map(item => `
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border ${item.isDeleted ? 'border-rose-200 dark:border-rose-950/60 bg-rose-50/20' : 'border-slate-200/80 dark:border-slate-800'} shadow-sm space-y-2.5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full ${item.isDeleted ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300'}">
-                ${item.subject}
-              </span>
-              <span class="text-xs font-bold text-slate-400">${item.marks} Marks</span>
-            </div>
-            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/40">
-              🔥 Asked ${item.freq}x
-            </span>
-          </div>
-
-          <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100">${item.question}</h4>
-
-          <div class="flex items-center justify-between pt-1">
-            <div class="flex items-center gap-1">
-              ${item.years.map(y => `<span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-500">${y}</span>`).join('')}
-            </div>
-            <button onclick="askPreset('${item.question.replace(/'/g, "\\'")}')" class="text-xs font-bold text-violet-600 dark:text-violet-400 flex items-center gap-1 touch-btn">
-              <span>Quick Solve</span>
-              <i class="ph-bold ph-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Render Portion Watchdog
-    function renderPortions() {
-      const container = document.getElementById('portionsGrid');
-      container.innerHTML = state.portions.map(p => `
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${p.subject}</span>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${p.badge === 'rose' ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'}">
-              ${p.status}
-            </span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-800 dark:text-white">${p.chapter}</h4>
-          <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">${p.note}</p>
-        </div>
-      `).join('');
-    }
-
-    // Mock Logger
-    function handleMockLog(e) {
-      e.preventDefault();
-      const sub = document.getElementById('logSubject').value;
-      const score = document.getElementById('logMarks').value;
-      const total = document.getElementById('logTotal').value;
-      state.streak += 1;
-      document.getElementById('streakDisplay').textContent = `${state.streak}d Streak`;
-      showToast(`Logged ${sub}: ${score}/${total}. Streak extended!`);
-    }
-
-    function clearChat() {
-      document.getElementById('chatMessages').innerHTML = `
-        <div class="flex items-start gap-2.5">
-          <div class="w-8 h-8 rounded-xl hero-gradient text-white flex items-center justify-center text-sm flex-shrink-0 shadow-sm">
-            <i class="ph-bold ph-robot"></i>
-          </div>
-          <div class="max-w-[85%] bg-slate-100 dark:bg-slate-800/80 rounded-2xl rounded-tl-none p-3.5 text-xs sm:text-sm text-slate-700 dark:text-slate-200 space-y-1.5 border border-slate-200/50 dark:border-slate-700/60 leading-relaxed">
-            <p class="font-bold text-slate-900 dark:text-white">Ask your doubt directly.</p>
-            <p>Type a derivation, formula question, or calculation. I will answer strictly with step marks and zero unnecessary chat.</p>
-          </div>
-        </div>
-      `;
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      document.getElementById('toastText').textContent = msg;
-      t.classList.remove('-translate-y-10', 'opacity-0');
-      setTimeout(() => t.classList.add('-translate-y-10', 'opacity-0'), 2500);
-    }
-
-    function escapeHtml(text) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-      return text.replace(/[&<>"']/g, m => map[m]);
-    }
-
-    // Lifecycle
-    window.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      updateAiStatus();
-      renderPYQs('all');
-      renderPortions();
-    });
-  </script>
+  <!-- Application Logic -->
+  <script src="app.js"></script>
 </body>
 </html>
