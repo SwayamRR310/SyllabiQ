@@ -1,16 +1,19 @@
 /* ==========================================================================
-   SYLLABIQ LOCAL DATABASE & STATE LAYER
+   SYLLABIQ PRODUCT OWNER (PO) DATA ENGINE
    ========================================================================== */
 
 const DB_KEYS = {
   USERS: "syllabiq_users_db",
   SESSION: "syllabiq_current_session",
+  CURRICULUM: "syllabiq_curriculum_db",
+  PYQS: "syllabiq_pyqs_db",
+  PORTIONS: "syllabiq_portions_db",
   API_KEY: "syllabiq_gemini_key",
   THEME: "syllabiq_theme"
 };
 
-// Curriculum & Chapter Blueprint per Board
-const boardCurriculumData = {
+// Seed Curriculum Data
+const defaultCurriculum = {
   "CBSE 10th": {
     "Physics": [
       { id: "cbse10_p1", title: "Light: Reflection & Refraction", marks: 7 },
@@ -41,37 +44,34 @@ const boardCurriculumData = {
     "Chemistry": [
       { id: "cbse12_c1", title: "Solutions & Colligative Properties", marks: 7 },
       { id: "cbse12_c2", title: "Electrochemistry", marks: 9 },
-      { id: "cbse12_c3", title: "Chemical Kinetics", marks: 7 },
-      { id: "cbse12_c4", title: "d and f Block Elements", marks: 7 }
+      { id: "cbse12_c3", title: "Chemical Kinetics", marks: 7 }
     ]
   },
   "ICSE 10th": {
     "Physics": [
       { id: "icse10_p1", title: "Force, Work, Power & Energy", marks: 12 },
-      { id: "icse10_p2", title: "Refraction through Lenses & Spectrum", marks: 14 },
-      { id: "icse10_p3", title: "Current Electricity & Household Circuits", marks: 12 }
+      { id: "icse10_p2", title: "Refraction through Lenses & Spectrum", marks: 14 }
     ]
   },
   "MH SSC 10th": {
     "Science 1": [
       { id: "mh10_s1", title: "Gravitation & Kepler's Laws", marks: 5 },
-      { id: "mh10_s2", title: "Periodic Classification of Elements", marks: 6 },
-      { id: "mh10_s3", title: "Effects of Electric Current", marks: 7 }
+      { id: "mh10_s2", title: "Effects of Electric Current", marks: 7 }
     ]
   },
   "MH HSC 12th": {
     "Physics": [
       { id: "mh12_p1", title: "Rotational Dynamics", marks: 7 },
-      { id: "mh12_p2", title: "Mechanical Properties of Fluids", marks: 7 },
-      { id: "mh12_p3", title: "Oscillations & Superposition of Waves", marks: 8 }
+      { id: "mh12_p2", title: "Mechanical Properties of Fluids", marks: 7 }
     ]
   }
 };
 
-// High-Yield PYQs
-const pyqData = [
+// Seed PYQ Data
+const defaultPYQs = [
   {
-    id: 1,
+    id: "pyq_1",
+    board: "CBSE 10th",
     subject: "Physics",
     recurrence: "Asked 7x in Boards",
     year: "2024, 2023, 2020, 2019",
@@ -79,7 +79,8 @@ const pyqData = [
     steps: "Formula: n = c / v. Step 1: Definition of sin(i)/sin(r). Step 2: Medium speed ratio."
   },
   {
-    id: 2,
+    id: "pyq_2",
+    board: "CBSE 10th",
     subject: "Chemistry",
     recurrence: "Asked 6x in Boards",
     year: "2024, 2022, 2021, 2018",
@@ -87,7 +88,8 @@ const pyqData = [
     steps: "Displacement reaction: Fe + CuSO4 -> FeSO4 + Cu. Blue changes to light green."
   },
   {
-    id: 3,
+    id: "pyq_3",
+    board: "CBSE 10th",
     subject: "Mathematics",
     recurrence: "Asked 5x in Boards",
     year: "2024, 2023, 2022",
@@ -96,32 +98,65 @@ const pyqData = [
   }
 ];
 
-// Portion Rationalization Notes
-const portionAlerts = {
+// Seed Portion Notices with PDF capability
+const defaultPortions = {
   "CBSE 10th": [
-    { subject: "Science", status: "Deleted", note: "Periodic Classification of Elements completely excised from syllabus." },
-    { subject: "Maths", status: "Reduced", note: "Euclid's Division Lemma (Ex 1.1) and Frustum of Cone removed." }
+    { id: "prt_1", subject: "Science", status: "Deleted", note: "Periodic Classification of Elements completely excised from syllabus.", pdfName: null, pdfData: null },
+    { id: "prt_2", subject: "Maths", status: "Reduced", note: "Euclid's Division Lemma (Ex 1.1) and Frustum of Cone removed.", pdfName: null, pdfData: null }
   ],
   "CBSE 12th": [
-    { subject: "Physics", status: "Reduced", note: "Potentiometer experiments and Davisson-Germer experiment deleted." },
-    { subject: "Chemistry", status: "Deleted", note: "Solid State, Surface Chemistry, and Polymers completely removed." }
-  ],
-  "ICSE 10th": [
-    { subject: "Physics", status: "Updated", note: "Modern Physics & radioactivity sections revised with SI standards." }
-  ],
-  "MH SSC 10th": [
-    { subject: "Science 2", status: "Active", note: "Heredity and Evolution: All numericals verified for 2025-2026." }
-  ],
-  "MH HSC 12th": [
-    { subject: "Maths", status: "Active", note: "Linear Programming & Differential Equations weightage adjusted." }
+    { id: "prt_3", subject: "Physics", status: "Reduced", note: "Potentiometer experiments and Davisson-Germer experiment deleted.", pdfName: null, pdfData: null }
   ]
 };
 
-// Active Session in memory
+// Initialize / Retrieve Dynamic Stores
+function getCurriculumDB() {
+  const data = localStorage.getItem(DB_KEYS.CURRICULUM);
+  if (!data) {
+    localStorage.setItem(DB_KEYS.CURRICULUM, JSON.stringify(defaultCurriculum));
+    return defaultCurriculum;
+  }
+  return JSON.parse(data);
+}
+
+function saveCurriculumDB(data) {
+  localStorage.setItem(DB_KEYS.CURRICULUM, JSON.stringify(data));
+}
+
+function getPYQDB() {
+  const data = localStorage.getItem(DB_KEYS.PYQS);
+  if (!data) {
+    localStorage.setItem(DB_KEYS.PYQS, JSON.stringify(defaultPYQs));
+    return defaultPYQs;
+  }
+  return JSON.parse(data);
+}
+
+function savePYQDB(data) {
+  localStorage.setItem(DB_KEYS.PYQS, JSON.stringify(data));
+}
+
+function getPortionDB() {
+  const data = localStorage.getItem(DB_KEYS.PORTIONS);
+  if (!data) {
+    localStorage.setItem(DB_KEYS.PORTIONS, JSON.stringify(defaultPortions));
+    return defaultPortions;
+  }
+  return JSON.parse(data);
+}
+
+function savePortionDB(data) {
+  localStorage.setItem(DB_KEYS.PORTIONS, JSON.stringify(data));
+}
+
+// Runtime State
 let currentUser = null;
 let currentBoard = "CBSE 10th";
 let activeProgressSubject = "All";
 let userApiKey = localStorage.getItem(DB_KEYS.API_KEY) || "";
+let selectedSubjectForChapterAdd = "";
+let uploadedPdfBase64 = null;
+let uploadedPdfName = null;
 
 /* ==========================================================================
    APP INITIALIZATION
@@ -152,7 +187,7 @@ function setupEventListeners() {
 }
 
 /* ==========================================================================
-   USER AUTHENTICATION & LOCAL DATABASE
+   AUTHENTICATION & ADMIN ACCESS
    ========================================================================== */
 function getLocalUsers() {
   return JSON.parse(localStorage.getItem(DB_KEYS.USERS) || "{}");
@@ -164,7 +199,9 @@ function saveLocalUsers(users) {
 
 function loadUserSession() {
   const sessionEmail = localStorage.getItem(DB_KEYS.SESSION);
-  if (sessionEmail) {
+  if (sessionEmail === "admin") {
+    currentUser = { name: "Product Owner (Admin)", email: "admin", role: "admin", board: currentBoard };
+  } else if (sessionEmail) {
     const users = getLocalUsers();
     if (users[sessionEmail]) {
       currentUser = users[sessionEmail];
@@ -177,6 +214,7 @@ function loadUserSession() {
 function updateAuthUI() {
   const authBtnText = document.getElementById("authBtnText");
   const greeting = document.getElementById("headerUserGreeting");
+  const adminBtn = document.getElementById("adminPortalBtn");
 
   if (currentUser) {
     authBtnText.innerText = currentUser.name.split(" ")[0];
@@ -184,12 +222,17 @@ function updateAuthUI() {
     document.getElementById("statTargetScore").innerText = (currentUser.targetScore || 95) + "%";
     document.getElementById("statStreak").innerText = `${currentUser.streak || 1} Days`;
     document.getElementById("statDoubts").innerText = currentUser.doubtsCount || 0;
+
+    // Show Admin Portal Button if Admin
+    if (currentUser.role === "admin") {
+      adminBtn.classList.remove("hidden");
+    } else {
+      adminBtn.classList.add("hidden");
+    }
   } else {
     authBtnText.innerText = "Sign In";
     greeting.innerText = "Guest Student";
-    document.getElementById("statTargetScore").innerText = "95%+";
-    document.getElementById("statStreak").innerText = "1 Day";
-    document.getElementById("statDoubts").innerText = "0";
+    adminBtn.classList.add("hidden");
   }
   renderProgressStats();
 }
@@ -198,7 +241,6 @@ let isSignUpMode = false;
 
 function handleAuthBtnClick() {
   if (currentUser) {
-    // Open Profile Modal
     document.getElementById("profileName").innerText = currentUser.name;
     document.getElementById("profileEmail").innerText = currentUser.email;
     document.getElementById("profileAvatar").innerText = currentUser.name.charAt(0).toUpperCase();
@@ -207,7 +249,6 @@ function handleAuthBtnClick() {
     document.getElementById("targetPercentageInput").value = currentUser.targetScore || 95;
     showModal("profileModal");
   } else {
-    // Open Auth Modal
     isSignUpMode = false;
     updateAuthModalState();
     showModal("authModal");
@@ -220,8 +261,8 @@ function toggleAuthMode() {
 }
 
 function updateAuthModalState() {
-  document.getElementById("authModalTitle").innerText = isSignUpMode ? "Create Student Account" : "Student Sign In";
-  document.getElementById("authModalSubtitle").innerText = isSignUpMode ? "Your progress and notes will be saved locally." : "Sign in to access your saved progress.";
+  document.getElementById("authModalTitle").innerText = isSignUpMode ? "Create Student Account" : "Student / Admin Sign In";
+  document.getElementById("authModalSubtitle").innerText = isSignUpMode ? "Saved locally on this device." : "Use 'admin' with pass 'admin123' to unlock content manager.";
   document.getElementById("authNameField").classList.toggle("hidden", !isSignUpMode);
   document.getElementById("authSubmitBtn").innerText = isSignUpMode ? "Register Account" : "Sign In";
   document.getElementById("authToggleQuestion").innerText = isSignUpMode ? "Already registered?" : "New student here?";
@@ -233,6 +274,17 @@ function handleAuthSubmit(e) {
   const email = document.getElementById("authEmailInput").value.trim().toLowerCase();
   const password = document.getElementById("authPasswordInput").value.trim();
   const name = document.getElementById("authNameInput").value.trim();
+
+  // Admin Shortcut for Product Owner
+  if (email === "admin" && password === "admin123") {
+    currentUser = { name: "Product Owner (Admin)", email: "admin", role: "admin", board: currentBoard };
+    localStorage.setItem(DB_KEYS.SESSION, "admin");
+    closeModals();
+    updateAuthUI();
+    alert("Logged in as Admin / Product Owner!");
+    switchTab("admin");
+    return;
+  }
 
   const users = getLocalUsers();
 
@@ -250,7 +302,7 @@ function handleAuthSubmit(e) {
       streak: 1,
       lastActiveDate: new Date().toDateString(),
       doubtsCount: 0,
-      completedChapters: {} // e.g. { "cbse10_p1": true }
+      completedChapters: {}
     };
     users[email] = newUser;
     saveLocalUsers(users);
@@ -289,22 +341,21 @@ function updateTargetScore() {
 }
 
 function syncCurrentUser() {
-  if (!currentUser) return;
+  if (!currentUser || currentUser.role === "admin") return;
   const users = getLocalUsers();
   users[currentUser.email] = currentUser;
   saveLocalUsers(users);
 }
 
-// Daily Streak Check-in
 function claimDailyStreak() {
   if (!currentUser) {
-    alert("Please sign in or create an account to record your streaks!");
+    alert("Please sign in or create an account to record streaks!");
     handleAuthBtnClick();
     return;
   }
   const today = new Date().toDateString();
   if (currentUser.lastActiveDate === today) {
-    alert("🔥 Streak already marked for today! Keep up the revision!");
+    alert("🔥 Streak already marked for today!");
     return;
   }
   currentUser.streak = (currentUser.streak || 0) + 1;
@@ -315,16 +366,16 @@ function claimDailyStreak() {
 }
 
 /* ==========================================================================
-   PROGRESS TRACKING & CHAPTER CHECKLIST
+   PROGRESS TRACKING (DYNAMIC FOR ALL SUBJECTS)
    ========================================================================== */
 function renderProgressView() {
-  const curriculum = boardCurriculumData[currentBoard] || {};
+  const curriculumDB = getCurriculumDB();
+  const curriculum = curriculumDB[currentBoard] || {};
   const subjects = Object.keys(curriculum);
 
-  // Render subject filter pills
   const pillContainer = document.getElementById("progressSubjectPills");
   if (subjects.length === 0) {
-    pillContainer.innerHTML = `<span class="text-xs text-slate-400">Curriculum preview not available for this board.</span>`;
+    pillContainer.innerHTML = `<span class="text-xs text-slate-400">No subjects configured for ${currentBoard} yet. (Add via Admin Portal)</span>`;
     document.getElementById("chapterChecklistContainer").innerHTML = "";
     return;
   }
@@ -335,7 +386,6 @@ function renderProgressView() {
   });
   pillContainer.innerHTML = pillsHtml;
 
-  // Render checklist chapters
   const checklistContainer = document.getElementById("chapterChecklistContainer");
   let allChapters = [];
 
@@ -378,7 +428,7 @@ function getGuestCompletedMap() {
 }
 
 function toggleChapterDone(chapterId) {
-  if (currentUser) {
+  if (currentUser && currentUser.role !== "admin") {
     if (!currentUser.completedChapters) currentUser.completedChapters = {};
     if (currentUser.completedChapters[chapterId]) {
       delete currentUser.completedChapters[chapterId];
@@ -387,7 +437,6 @@ function toggleChapterDone(chapterId) {
     }
     syncCurrentUser();
   } else {
-    // Guest fallback
     const map = getGuestCompletedMap();
     if (map[chapterId]) delete map[chapterId];
     else map[chapterId] = true;
@@ -398,7 +447,7 @@ function toggleChapterDone(chapterId) {
 
 function resetCurrentBoardProgress() {
   if (confirm("Reset all ticked chapters for this board?")) {
-    if (currentUser) {
+    if (currentUser && currentUser.role !== "admin") {
       currentUser.completedChapters = {};
       syncCurrentUser();
     } else {
@@ -409,7 +458,8 @@ function resetCurrentBoardProgress() {
 }
 
 function renderProgressStats() {
-  const curriculum = boardCurriculumData[currentBoard] || {};
+  const curriculumDB = getCurriculumDB();
+  const curriculum = curriculumDB[currentBoard] || {};
   let totalChapters = 0;
   let totalMarks = 0;
   let earnedMarks = 0;
@@ -431,7 +481,6 @@ function renderProgressStats() {
   const pct = totalChapters > 0 ? Math.round((completedCount / totalChapters) * 100) : 0;
   const simulatedScore = totalMarks > 0 ? Math.min(100, Math.round(40 + (earnedMarks / totalMarks) * 55)) : 40;
 
-  // Update elements
   document.getElementById("statProgressPct").innerText = `${pct}%`;
   document.getElementById("statChaptersRatio").innerText = `${completedCount}/${totalChapters}`;
   document.getElementById("progressPercentageLabel").innerText = `${pct}%`;
@@ -441,53 +490,25 @@ function renderProgressStats() {
 }
 
 /* ==========================================================================
-   NAVIGATION & BOARD SELECTION
-   ========================================================================== */
-function switchTab(tabId) {
-  const tabs = ["home", "progress", "ai", "pyqs", "portion"];
-  tabs.forEach(t => {
-    const view = document.getElementById("view" + capitalize(t));
-    if (view) view.classList.add("hidden");
-    const navBtn = document.querySelector(`[data-tab="${t}"]`);
-    if (navBtn) navBtn.classList.remove("active");
-  });
-
-  const activeView = document.getElementById("view" + capitalize(tabId));
-  if (activeView) activeView.classList.remove("hidden");
-
-  const activeNav = document.querySelector(`[data-tab="${tabId}"]`);
-  if (activeNav) activeNav.classList.add("active");
-
-  lucide.createIcons();
-}
-
-function capitalize(s) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function selectBoard(boardName) {
-  currentBoard = boardName;
-  if (currentUser) {
-    currentUser.board = boardName;
-    syncCurrentUser();
-  }
-  renderBoard();
-  renderPortions();
-  renderProgressView();
-  closeModals();
-}
-
-function renderBoard() {
-  document.getElementById("currentBoardLabel").innerText = currentBoard;
-  document.getElementById("chatBoardLabel").innerText = currentBoard;
-}
-
-/* ==========================================================================
-   HIGH YIELD PYQS & PORTION TRACKER
+   HIGH YIELD PYQS & PORTION NOTICES (PDF VIEWING)
    ========================================================================== */
 function renderPYQs(filter) {
+  const allPyqs = getPYQDB();
+  const boardPyqs = allPyqs.filter(q => !q.board || q.board === currentBoard);
+
+  // Update subject dropdown filter options
+  const filterSelect = document.getElementById("subjectFilter");
+  const uniqueSubjects = [...new Set(boardPyqs.map(q => q.subject))];
+  filterSelect.innerHTML = `<option value="all">All Subjects</option>` + uniqueSubjects.map(s => `<option value="${s}">${s}</option>`).join("");
+  if (filter !== "all") filterSelect.value = filter;
+
   const container = document.getElementById("pyqContainer");
-  const filtered = filter === "all" ? pyqData : pyqData.filter(q => q.subject.toLowerCase() === filter.toLowerCase());
+  const filtered = filter === "all" ? boardPyqs : boardPyqs.filter(q => q.subject.toLowerCase() === filter.toLowerCase());
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="text-xs text-slate-400 p-4 text-center">No PYQs found for this subject yet.</div>`;
+    return;
+  }
 
   container.innerHTML = filtered.map(q => `
     <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 rounded-2xl shadow-sm">
@@ -505,33 +526,347 @@ function renderPYQs(filter) {
 }
 
 function renderPortions() {
-  const list = portionAlerts[currentBoard] || [];
+  const portionDB = getPortionDB();
+  const list = portionDB[currentBoard] || [];
   const container = document.getElementById("portionCardList");
 
   if (list.length === 0) {
-    container.innerHTML = `<div class="text-xs text-slate-400 p-4 text-center">No major portion omissions registered for ${currentBoard}.</div>`;
+    container.innerHTML = `<div class="text-xs text-slate-400 p-4 text-center">No portion omissions registered for ${currentBoard}.</div>`;
     return;
   }
 
   container.innerHTML = list.map(item => `
-    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 rounded-2xl flex items-start gap-3">
-      <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center shrink-0 text-xs font-bold">
-        ${item.status === 'Deleted' ? '✕' : '!'}
-      </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-xs text-slate-900 dark:text-white">${item.subject}</span>
-          <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-600">${item.status}</span>
+    <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center shrink-0 text-xs font-bold">
+          ${item.status === 'Deleted' ? '✕' : '!'}
         </div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${item.note}</p>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-xs text-slate-900 dark:text-white">${item.subject}</span>
+            <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-red-600">${item.status}</span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${item.note}</p>
+        </div>
       </div>
+      ${item.pdfData ? `
+        <a href="${item.pdfData}" download="${item.pdfName || 'Syllabus_Circular.pdf'}" class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 rounded-xl text-xs font-semibold hover:bg-violet-100 transition border border-violet-200 dark:border-violet-900/40">
+          <i data-lucide="file-down" class="w-4 h-4"></i>
+          <span>Download PDF</span>
+        </a>
+      ` : ''}
+    </div>
+  `).join("");
+  lucide.createIcons();
+}
+
+/* ==========================================================================
+   PRODUCT OWNER / ADMIN CONSOLE LOGIC
+   ========================================================================== */
+function switchAdminSection(section) {
+  ["curriculum", "pyqs", "portion"].forEach(sec => {
+    document.getElementById(`adminSec-${sec}`).classList.add("hidden");
+    document.getElementById(`adminSecBtn-${sec}`).classList.remove("active");
+  });
+  document.getElementById(`adminSec-${section}`).classList.remove("hidden");
+  document.getElementById(`adminSecBtn-${section}`).classList.add("active");
+
+  if (section === "curriculum") renderAdminCurriculum();
+  if (section === "pyqs") renderAdminPYQs();
+  if (section === "portion") renderAdminPortions();
+}
+
+function renderAdminCurriculum() {
+  document.getElementById("adminBoardTarget").innerText = currentBoard;
+  const db = getCurriculumDB();
+  const curriculum = db[currentBoard] || {};
+  const container = document.getElementById("adminCurriculumTree");
+
+  const subjects = Object.keys(curriculum);
+  if (subjects.length === 0) {
+    container.innerHTML = `<div class="text-xs text-slate-400 p-4 border border-dashed rounded-xl text-center">No subjects yet. Click "+ Add Subject" to begin.</div>`;
+    return;
+  }
+
+  container.innerHTML = subjects.map(sub => {
+    const chapters = curriculum[sub] || [];
+    return `
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+          <div class="flex items-center gap-2">
+            <h4 class="font-extrabold text-sm text-slate-900 dark:text-white">${sub}</h4>
+            <span class="text-[10px] text-slate-400 font-mono">(${chapters.length} Chapters)</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="promptAddChapter('${sub}')" class="text-xs text-violet-600 hover:text-violet-700 font-semibold px-2 py-1">+ Add Chapter</button>
+            <button onclick="adminDeleteSubject('${sub}')" class="text-xs text-red-500 hover:text-red-700 px-1.5 py-1">Delete Subject</button>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          ${chapters.map(ch => `
+            <div class="flex items-center justify-between text-xs bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg">
+              <span class="text-slate-800 dark:text-slate-200">${ch.title} <span class="text-slate-400 font-mono text-[10px]">(${ch.marks} Marks)</span></span>
+              <button onclick="adminDeleteChapter('${sub}', '${ch.id}')" class="text-slate-400 hover:text-red-500 text-[11px]">✕</button>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function adminSaveNewSubject() {
+  const name = document.getElementById("newSubjectName").value.trim();
+  if (!name) return;
+
+  const db = getCurriculumDB();
+  if (!db[currentBoard]) db[currentBoard] = {};
+  if (!db[currentBoard][name]) {
+    db[currentBoard][name] = [];
+    saveCurriculumDB(db);
+  }
+  document.getElementById("newSubjectName").value = "";
+  closeModals();
+  renderAdminCurriculum();
+  renderProgressView();
+}
+
+function adminDeleteSubject(sub) {
+  if (!confirm(`Delete subject "${sub}" and all its chapters?`)) return;
+  const db = getCurriculumDB();
+  if (db[currentBoard] && db[currentBoard][sub]) {
+    delete db[currentBoard][sub];
+    saveCurriculumDB(db);
+    renderAdminCurriculum();
+    renderProgressView();
+  }
+}
+
+function promptAddChapter(sub) {
+  selectedSubjectForChapterAdd = sub;
+  document.getElementById("addChapterSubjectTarget").innerText = sub;
+  showModal("addChapterModal");
+}
+
+function adminSaveNewChapter() {
+  const title = document.getElementById("newChapterTitle").value.trim();
+  const marks = parseInt(document.getElementById("newChapterMarks").value) || 5;
+  if (!title) return;
+
+  const db = getCurriculumDB();
+  if (!db[currentBoard] || !db[currentBoard][selectedSubjectForChapterAdd]) return;
+
+  const newId = "ch_" + Date.now();
+  db[currentBoard][selectedSubjectForChapterAdd].push({ id: newId, title: title, marks: marks });
+  saveCurriculumDB(db);
+
+  document.getElementById("newChapterTitle").value = "";
+  document.getElementById("newChapterMarks").value = "";
+  closeModals();
+  renderAdminCurriculum();
+  renderProgressView();
+}
+
+function adminDeleteChapter(sub, chId) {
+  const db = getCurriculumDB();
+  if (db[currentBoard] && db[currentBoard][sub]) {
+    db[currentBoard][sub] = db[currentBoard][sub].filter(ch => ch.id !== chId);
+    saveCurriculumDB(db);
+    renderAdminCurriculum();
+    renderProgressView();
+  }
+}
+
+// Admin PYQs
+function renderAdminPYQs() {
+  const allPyqs = getPYQDB();
+  const boardPyqs = allPyqs.filter(q => !q.board || q.board === currentBoard);
+  const container = document.getElementById("adminPyqList");
+
+  // Populate Subject Select in Modal
+  const db = getCurriculumDB();
+  const subjects = Object.keys(db[currentBoard] || {});
+  const pyqSubSelect = document.getElementById("newPyqSubject");
+  pyqSubSelect.innerHTML = subjects.map(s => `<option value="${s}">${s}</option>`).join("");
+
+  container.innerHTML = boardPyqs.map(q => `
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center justify-between text-xs">
+      <div>
+        <div class="font-bold text-slate-800 dark:text-slate-200">${q.question.slice(0, 70)}...</div>
+        <div class="text-[10px] text-slate-400">${q.subject} · ${q.recurrence}</div>
+      </div>
+      <button onclick="adminDeletePYQ('${q.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1">Delete</button>
     </div>
   `).join("");
 }
 
+function adminSaveNewPyq() {
+  const subject = document.getElementById("newPyqSubject").value;
+  const recurrence = document.getElementById("newPyqRecurrence").value.trim() || "Asked 5x in Boards";
+  const year = document.getElementById("newPyqYears").value.trim() || "2024, 2023";
+  const question = document.getElementById("newPyqQuestion").value.trim();
+  const steps = document.getElementById("newPyqSteps").value.trim();
+
+  if (!question) return;
+
+  const allPyqs = getPYQDB();
+  allPyqs.unshift({
+    id: "pyq_" + Date.now(),
+    board: currentBoard,
+    subject: subject,
+    recurrence: recurrence,
+    year: year,
+    question: question,
+    steps: steps
+  });
+  savePYQDB(allPyqs);
+
+  document.getElementById("newPyqQuestion").value = "";
+  document.getElementById("newPyqSteps").value = "";
+  closeModals();
+  renderAdminPYQs();
+  renderPYQs("all");
+}
+
+function adminDeletePYQ(id) {
+  let allPyqs = getPYQDB();
+  allPyqs = allPyqs.filter(q => q.id !== id);
+  savePYQDB(allPyqs);
+  renderAdminPYQs();
+  renderPYQs("all");
+}
+
+// Admin Portion & PDF Uploader
+function previewPdfFileName(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("Please select a PDF smaller than 5MB.");
+    input.value = "";
+    return;
+  }
+
+  uploadedPdfName = file.name;
+  document.getElementById("pdfFileNameDisplay").innerText = `Selected: ${file.name}`;
+
+  // Read file into Data URL (Base64) to store directly in browser storage
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedPdfBase64 = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderAdminPortions() {
+  const db = getPortionDB();
+  const list = db[currentBoard] || [];
+  const container = document.getElementById("adminPortionList");
+
+  container.innerHTML = list.map(item => `
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex items-center justify-between text-xs">
+      <div>
+        <div class="font-bold text-slate-800 dark:text-slate-200">${item.subject} (${item.status})</div>
+        <div class="text-[10px] text-slate-400">${item.note} ${item.pdfName ? `· 📎 ${item.pdfName}` : ''}</div>
+      </div>
+      <button onclick="adminDeletePortion('${item.id}')" class="text-red-500 hover:text-red-700 text-xs px-2 py-1">Delete</button>
+    </div>
+  `).join("");
+}
+
+function adminSaveNewPortion() {
+  const subject = document.getElementById("newPortionSubject").value.trim();
+  const status = document.getElementById("newPortionStatus").value;
+  const note = document.getElementById("newPortionNote").value.trim();
+
+  if (!subject || !note) return;
+
+  const db = getPortionDB();
+  if (!db[currentBoard]) db[currentBoard] = [];
+
+  db[currentBoard].unshift({
+    id: "prt_" + Date.now(),
+    subject: subject,
+    status: status,
+    note: note,
+    pdfName: uploadedPdfName,
+    pdfData: uploadedPdfBase64
+  });
+
+  savePortionDB(db);
+
+  // Clear fields
+  document.getElementById("newPortionSubject").value = "";
+  document.getElementById("newPortionNote").value = "";
+  document.getElementById("newPortionPdfFile").value = "";
+  uploadedPdfBase64 = null;
+  uploadedPdfName = null;
+  document.getElementById("pdfFileNameDisplay").innerText = "Optional (Max 5MB)";
+
+  closeModals();
+  renderAdminPortions();
+  renderPortions();
+}
+
+function adminDeletePortion(id) {
+  const db = getPortionDB();
+  if (db[currentBoard]) {
+    db[currentBoard] = db[currentBoard].filter(p => p.id !== id);
+    savePortionDB(db);
+    renderAdminPortions();
+    renderPortions();
+  }
+}
+
 /* ==========================================================================
-   LOW-TOKEN DOUBT SOLVER AI ENGINE
+   DOUBT SOLVER & NAVIGATION
    ========================================================================== */
+function switchTab(tabId) {
+  const tabs = ["home", "progress", "ai", "pyqs", "portion", "admin"];
+  tabs.forEach(t => {
+    const view = document.getElementById("view" + capitalize(t));
+    if (view) view.classList.add("hidden");
+    const navBtn = document.querySelector(`[data-tab="${t}"]`);
+    if (navBtn) navBtn.classList.remove("active");
+  });
+
+  const activeView = document.getElementById("view" + capitalize(tabId));
+  if (activeView) activeView.classList.remove("hidden");
+
+  const activeNav = document.querySelector(`[data-tab="${tabId}"]`);
+  if (activeNav) activeNav.classList.add("active");
+
+  if (tabId === "admin") {
+    switchAdminSection("curriculum");
+  }
+
+  lucide.createIcons();
+}
+
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function selectBoard(boardName) {
+  currentBoard = boardName;
+  if (currentUser && currentUser.role !== "admin") {
+    currentUser.board = boardName;
+    syncCurrentUser();
+  }
+  renderBoard();
+  renderPortions();
+  renderProgressView();
+  renderPYQs("all");
+  closeModals();
+}
+
+function renderBoard() {
+  document.getElementById("currentBoardLabel").innerText = currentBoard;
+  document.getElementById("chatBoardLabel").innerText = currentBoard;
+}
+
+// Low-Token AI
 async function handleChatSubmit(e) {
   e.preventDefault();
   const input = document.getElementById("doubtInput");
@@ -541,7 +876,7 @@ async function handleChatSubmit(e) {
   appendChat("user", doubt);
   input.value = "";
 
-  if (currentUser) {
+  if (currentUser && currentUser.role !== "admin") {
     currentUser.doubtsCount = (currentUser.doubtsCount || 0) + 1;
     syncCurrentUser();
     updateAuthUI();
@@ -559,7 +894,7 @@ async function handleChatSubmit(e) {
     }
     updateChatBubble(aiBubbleId, answerText);
   } catch (err) {
-    updateChatBubble(aiBubbleId, "Error connecting to AI. Step fallback: \n" + simulateStepSolution(doubt));
+    updateChatBubble(aiBubbleId, "Error connecting to AI: \n" + simulateStepSolution(doubt));
   }
 }
 
@@ -626,9 +961,6 @@ function presetQuestion(q) {
   document.getElementById("doubtInput").focus();
 }
 
-/* ==========================================================================
-   THEME, MODALS, AND CONFIG
-   ========================================================================== */
 function initTheme() {
   const isDark = localStorage.getItem(DB_KEYS.THEME) === "dark" || 
     (!localStorage.getItem(DB_KEYS.THEME) && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -649,6 +981,10 @@ function closeModals() {
   document.getElementById("keyModal").classList.add("hidden");
   document.getElementById("authModal").classList.add("hidden");
   document.getElementById("profileModal").classList.add("hidden");
+  document.getElementById("addSubjectModal").classList.add("hidden");
+  document.getElementById("addChapterModal").classList.add("hidden");
+  document.getElementById("addPyqModal").classList.add("hidden");
+  document.getElementById("addPortionModal").classList.add("hidden");
 }
 
 function saveApiKey() {

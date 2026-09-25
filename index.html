@@ -24,12 +24,11 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-  <!-- Top App Navigation -->
+  <!-- Top Navigation Header -->
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -49,19 +48,25 @@
           <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
         </button>
 
+        <!-- Admin Portal Badge (Hidden by default, shown when Admin logs in) -->
+        <button id="adminPortalBtn" class="hidden flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-xs font-bold transition hover:bg-amber-500/20" onclick="switchTab('admin')">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          <span>Admin</span>
+        </button>
+
         <!-- Auth / Profile Avatar Button -->
         <button id="authBtn" class="flex items-center gap-1.5 p-1.5 sm:px-2.5 rounded-full bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-900/50 hover:bg-violet-100 transition text-xs font-semibold">
           <i data-lucide="user" class="w-4 h-4"></i>
           <span id="authBtnText" class="hidden sm:inline">Sign In</span>
         </button>
 
-        <!-- Gemini API Key Modal -->
+        <!-- Gemini API Key -->
         <button id="apiKeyModalBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Gemini AI Key">
           <i data-lucide="key" class="w-4 h-4"></i>
         </button>
 
         <!-- Theme Toggle -->
-        <button id="themeToggleBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Toggle Theme">
+        <button id="themeToggleBtn" class="p-2 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
           <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
           <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-600"></i>
         </button>
@@ -69,31 +74,28 @@
     </div>
   </header>
 
-  <!-- Main Content Container -->
+  <!-- Main Views Container -->
   <main class="flex-1 max-w-4xl w-full mx-auto p-4 pb-28">
 
     <!-- TAB 1: HOME DASHBOARD -->
     <section id="viewHome" class="space-y-5">
-      <!-- Portion Notice Alert -->
       <div id="portionNotice" class="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
         <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
           <i data-lucide="bell" class="w-4 h-4"></i>
         </div>
         <div class="flex-1 text-xs">
-          <h4 class="font-bold text-slate-900 dark:text-white">Portion Watchdog Synced</h4>
+          <h4 class="font-bold text-slate-900 dark:text-white">Portion Watchdog Active</h4>
           <p class="text-slate-600 dark:text-slate-400 mt-0.5" id="portionNoticeText">
-            Rationalized portions mapped for 2025-2026. Outdated questions are automatically marked.
+            Rationalized curriculum synced. Outdated PYQs flagged automatically.
           </p>
         </div>
       </div>
 
-      <!-- Quick Metrics Grid -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <!-- Streak Card with Check-In -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-pointer group" onclick="claimDailyStreak()">
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between cursor-pointer" onclick="claimDailyStreak()">
           <div class="flex items-center justify-between">
             <span class="text-2xl">🔥</span>
-            <span id="streakBadge" class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-600">Tap to Check-in</span>
+            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-950/60 text-orange-600">Check-in</span>
           </div>
           <div class="mt-2">
             <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="statStreak">1 Day</div>
@@ -101,7 +103,6 @@
           </div>
         </div>
 
-        <!-- Syllabus Coverage -->
         <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <i data-lucide="pie-chart" class="w-5 h-5 text-violet-600"></i>
@@ -113,7 +114,6 @@
           </div>
         </div>
 
-        <!-- Doubts Solved Counter -->
         <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <i data-lucide="sparkles" class="w-5 h-5 text-cyan-600"></i>
@@ -125,11 +125,10 @@
           </div>
         </div>
 
-        <!-- Target Grade -->
         <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between">
           <div class="flex items-center justify-between">
             <i data-lucide="target" class="w-5 h-5 text-emerald-600"></i>
-            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1 rounded" id="statTargetBadge">Tier 1</span>
+            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1 rounded">Goal</span>
           </div>
           <div class="mt-2">
             <div class="text-xl font-extrabold text-slate-900 dark:text-white" id="statTargetScore">95%+</div>
@@ -138,24 +137,23 @@
         </div>
       </div>
 
-      <!-- Quick Action Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div onclick="switchTab('ai')" class="cursor-pointer bg-gradient-to-br from-violet-600 to-indigo-600 text-white rounded-2xl p-5 shadow-lg shadow-violet-500/15 relative overflow-hidden group">
           <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase bg-white/20 px-2 py-0.5 rounded-full mb-2">Low-Token AI</span>
           <h3 class="text-base font-bold">Ask Doubt Solver</h3>
-          <p class="text-violet-100 text-xs mt-1">Numerical steps & examiners' marking guidelines.</p>
+          <p class="text-violet-100 text-xs mt-1">Numerical steps & examiners' marking breakdown.</p>
         </div>
 
         <div onclick="switchTab('progress')" class="cursor-pointer bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:border-violet-500/40 transition">
-          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full mb-2">Checklist & Diagnostics</span>
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full mb-2">Checklist & Marks</span>
           <h3 class="text-base font-bold text-slate-900 dark:text-white">Track Chapters</h3>
-          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Tick off completed chapters & simulate marks.</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Tick off completed units & simulate scores.</p>
         </div>
 
         <div onclick="switchTab('pyqs')" class="cursor-pointer bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:border-violet-500/40 transition">
-          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-cyan-600 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full mb-2">Frequency Sorted</span>
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-cyan-600 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full mb-2">High Recurrence</span>
           <h3 class="text-base font-bold text-slate-900 dark:text-white">Frequent PYQs</h3>
-          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Study questions recurring 5x+ in board history.</p>
+          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Explore questions asked 5+ times in board tests.</p>
         </div>
       </div>
     </section>
@@ -164,15 +162,12 @@
     <section id="viewProgress" class="hidden space-y-5">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Syllabus Progress & Simulator</h2>
-          <p class="text-xs text-slate-500">Check off chapters you've revised to update your board readiness.</p>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Syllabus Progress & Mark Simulator</h2>
+          <p class="text-xs text-slate-500">Tick completed chapters to calibrate your estimated board percentage.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="resetCurrentBoardProgress()" class="text-xs text-slate-400 hover:text-red-500 transition px-2 py-1">Reset</button>
-        </div>
+        <button onclick="resetCurrentBoardProgress()" class="text-xs text-slate-400 hover:text-red-500 transition px-2 py-1">Reset</button>
       </div>
 
-      <!-- Live Target Progress Bar -->
       <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-2">
         <div class="flex items-center justify-between text-xs font-semibold">
           <span>Overall Preparation Meter</span>
@@ -188,14 +183,10 @@
       </div>
 
       <!-- Subject Filter Pills -->
-      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar" id="progressSubjectPills">
-        <!-- Rendered via JS -->
-      </div>
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar" id="progressSubjectPills"></div>
 
       <!-- Chapter Checklist Container -->
-      <div id="chapterChecklistContainer" class="space-y-2">
-        <!-- Rendered via JS -->
-      </div>
+      <div id="chapterChecklistContainer" class="space-y-2"></div>
     </section>
 
     <!-- TAB 3: DOUBT SOLVER AI -->
@@ -214,24 +205,21 @@
           <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">Token Saver Active</span>
         </div>
 
-        <!-- Chat Messages -->
         <div id="chatLog" class="py-4 space-y-3 min-h-[280px] max-h-[380px] overflow-y-auto">
           <div class="flex items-start gap-2.5">
             <div class="w-7 h-7 rounded-full bg-violet-600 text-white flex items-center justify-center text-xs shrink-0 font-bold">AI</div>
             <div class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs p-3 rounded-2xl rounded-tl-sm max-w-[85%]">
-              Hello! I'm calibrated for <strong id="chatBoardLabel">CBSE 10th</strong>. Send any numerical, derivation, or formula doubt for stepwise marks breakdown.
+              Hello! Calibrated for <strong id="chatBoardLabel">CBSE 10th</strong>. Send any numerical, derivation, or formula question.
             </div>
           </div>
         </div>
 
-        <!-- Fast Preset Chips -->
         <div class="flex gap-1.5 overflow-x-auto py-2 no-scrollbar border-t border-slate-100 dark:border-slate-800">
-          <button onclick="presetQuestion('Find focal length of convex lens with power +2.5 D with steps')" class="chip">Lens Power Calculation</button>
+          <button onclick="presetQuestion('Find focal length of convex lens with power +2.5 D with steps')" class="chip">Convex Lens Power</button>
           <button onclick="presetQuestion('State Ohm\'s Law and write formula with SI units')" class="chip">Ohm's Law</button>
           <button onclick="presetQuestion('Balance: Fe + H2O -> Fe3O4 + H2 with steps')" class="chip">Balance Reaction</button>
         </div>
 
-        <!-- Input Form -->
         <form id="chatForm" class="flex gap-2 pt-2">
           <input type="text" id="doubtInput" placeholder="Type a numerical or conceptual doubt..." class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500" required>
           <button type="submit" id="sendBtn" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition">
@@ -247,37 +235,85 @@
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-lg font-bold text-slate-900 dark:text-white">Frequent Board PYQs</h2>
-          <p class="text-xs text-slate-500">Ranked by appearance in past 10-year board question papers</p>
+          <p class="text-xs text-slate-500">Sorted by past 10-year recurrence rate</p>
         </div>
         <select id="subjectFilter" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2.5 py-1.5 font-medium">
           <option value="all">All Subjects</option>
-          <option value="Physics">Physics</option>
-          <option value="Chemistry">Chemistry</option>
-          <option value="Mathematics">Mathematics</option>
-          <option value="Biology">Biology</option>
         </select>
       </div>
 
-      <div id="pyqContainer" class="space-y-3">
-        <!-- Rendered via JS -->
-      </div>
+      <div id="pyqContainer" class="space-y-3"></div>
     </section>
 
-    <!-- TAB 5: PORTION WATCHDOG -->
+    <!-- TAB 5: PORTION NOTICES & OFFICIAL PDFS -->
     <section id="viewPortion" class="hidden space-y-4">
-      <div>
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Portion Rationalization Tracker</h2>
-        <p class="text-xs text-slate-500">Deleted topics and syllabus updates from official education boards</p>
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white">Portion Rationalization & Official PDFs</h2>
+          <p class="text-xs text-slate-500">Verified official circulars, deleted portions, and downloadable syllabus PDFs</p>
+        </div>
       </div>
 
-      <div id="portionCardList" class="space-y-3">
-        <!-- Rendered via JS -->
+      <div id="portionCardList" class="space-y-3"></div>
+    </section>
+
+    <!-- TAB 6: ADMIN CONSOLE (Product Owner Portal) -->
+    <section id="viewAdmin" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-amber-500/10 via-violet-500/10 to-transparent p-5 rounded-2xl border border-amber-500/30 flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded bg-amber-500 text-white">Owner Portal</span>
+            <h2 class="text-base font-extrabold text-slate-900 dark:text-white">SyllabiQ Content Manager</h2>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Easily add new subjects, chapters, PYQs, and upload official PDF portion circulars.</p>
+        </div>
+        <button onclick="switchTab('home')" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">Exit Admin</button>
+      </div>
+
+      <!-- Sub-Tabs in Admin -->
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="switchAdminSection('curriculum')" id="adminSecBtn-curriculum" class="admin-tab active py-2 rounded-xl text-xs font-bold transition">1. Subjects & Chapters</button>
+        <button onclick="switchAdminSection('pyqs')" id="adminSecBtn-pyqs" class="admin-tab py-2 rounded-xl text-xs font-bold transition">2. Add PYQs</button>
+        <button onclick="switchAdminSection('portion')" id="adminSecBtn-portion" class="admin-tab py-2 rounded-xl text-xs font-bold transition">3. Portion & PDFs</button>
+      </div>
+
+      <!-- Admin Panel 1: Curriculum / Subjects & Chapters -->
+      <div id="adminSec-curriculum" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Manage Subjects for: <span id="adminBoardTarget" class="text-violet-600">CBSE 10th</span></h3>
+          <button onclick="showModal('addSubjectModal')" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Subject
+          </button>
+        </div>
+        <div id="adminCurriculumTree" class="space-y-3"></div>
+      </div>
+
+      <!-- Admin Panel 2: PYQ Manager -->
+      <div id="adminSec-pyqs" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Add Board Exam Questions</h3>
+          <button onclick="showModal('addPyqModal')" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-sm">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Question
+          </button>
+        </div>
+        <div id="adminPyqList" class="space-y-2"></div>
+      </div>
+
+      <!-- Admin Panel 3: Portion Notices & PDF Uploader -->
+      <div id="adminSec-portion" class="hidden space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">Upload Official Circulars & PDFs</h3>
+          <button onclick="showModal('addPortionModal')" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-sm">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload PDF / Notice
+          </button>
+        </div>
+        <div id="adminPortionList" class="space-y-2"></div>
       </div>
     </section>
 
   </main>
 
-  <!-- Bottom Navigation Bar (5 Tabs) -->
+  <!-- Bottom Navigation Bar (5 Main Tabs) -->
   <nav class="fixed bottom-0 inset-x-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 z-40">
     <div class="max-w-md mx-auto grid grid-cols-5 h-16">
       <button onclick="switchTab('home')" class="nav-tab active flex flex-col items-center justify-center text-slate-400 hover:text-violet-600 dark:hover:text-violet-400" data-tab="home">
@@ -307,17 +343,17 @@
     </div>
   </nav>
 
-  <!-- MODAL: Auth (Sign In / Register) -->
+  <!-- ================= MODALS ================= -->
+
+  <!-- MODAL: Auth (Sign In / Register / Admin Login) -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="font-extrabold text-base text-slate-900 dark:text-white" id="authModalTitle">Student Sign In</h3>
-          <p class="text-xs text-slate-400" id="authModalSubtitle">Sign in to sync your streak and chapter progress.</p>
+          <p class="text-xs text-slate-400" id="authModalSubtitle">Sign in to save streaks and chapters locally.</p>
         </div>
-        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
 
       <form id="authForm" class="space-y-3">
@@ -327,12 +363,12 @@
         </div>
 
         <div class="space-y-1">
-          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Email or Roll ID</label>
+          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Email (Or use 'admin' for owner portal)</label>
           <input type="text" id="authEmailInput" placeholder="student@example.com" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
         </div>
 
         <div class="space-y-1">
-          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Passcode</label>
+          <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Passcode (Admin: admin123)</label>
           <input type="password" id="authPasswordInput" placeholder="••••••••" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
         </div>
 
@@ -348,23 +384,20 @@
     </div>
   </div>
 
-  <!-- MODAL: Student Profile & Settings -->
+  <!-- MODAL: Profile -->
   <div id="profileModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
       <div class="flex items-center gap-3">
-        <div class="w-12 h-12 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-violet-500/20" id="profileAvatar">
-          S
-        </div>
+        <div class="w-12 h-12 rounded-full bg-violet-600 text-white flex items-center justify-center text-lg font-bold shadow-md shadow-violet-500/20" id="profileAvatar">S</div>
         <div>
           <h3 class="font-bold text-sm text-slate-900 dark:text-white" id="profileName">Swayam</h3>
           <p class="text-xs text-slate-400" id="profileEmail">swayam@example.com</p>
         </div>
       </div>
 
-      <!-- Quick Profile Stats -->
       <div class="grid grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
         <div>
-          <span class="text-slate-400 block text-[10px]">Registered Board</span>
+          <span class="text-slate-400 block text-[10px]">Current Board</span>
           <span class="font-bold text-slate-800 dark:text-slate-200" id="profileBoardLabel">CBSE 10th</span>
         </div>
         <div>
@@ -374,7 +407,7 @@
       </div>
 
       <div class="space-y-1">
-        <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Update Target Percentage</label>
+        <label class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Set Target %</label>
         <div class="flex gap-2">
           <input type="number" id="targetPercentageInput" min="40" max="100" class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2 outline-none" value="95">
           <button onclick="updateTargetScore()" class="bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">Set</button>
@@ -382,18 +415,16 @@
       </div>
 
       <div class="flex flex-col gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-        <button onclick="logoutStudent()" class="w-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 py-2 rounded-xl text-xs font-semibold hover:bg-red-100 dark:hover:bg-red-900/60 transition">
-          Sign Out
-        </button>
-        <button onclick="closeModals()" class="w-full py-1 text-xs text-slate-400 hover:text-slate-600">Close</button>
+        <button onclick="logoutStudent()" class="w-full bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 py-2 rounded-xl text-xs font-semibold hover:bg-red-100">Sign Out</button>
+        <button onclick="closeModals()" class="w-full py-1 text-xs text-slate-400">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: Board Selection -->
+  <!-- MODAL: Board Switcher -->
   <div id="boardModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
-      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Choose Your Examination Board</h3>
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Choose Examination Board</h3>
       <div class="space-y-2">
         <button onclick="selectBoard('CBSE 10th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">CBSE Class 10</button>
         <button onclick="selectBoard('CBSE 12th')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/40 hover:text-violet-600 transition">CBSE Class 12</button>
@@ -405,14 +436,14 @@
     </div>
   </div>
 
-  <!-- MODAL: API Key -->
+  <!-- MODAL: Gemini API Key -->
   <div id="keyModal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-4">
       <div>
         <h3 class="font-bold text-sm text-slate-900 dark:text-white">Gemini API Configuration</h3>
-        <p class="text-xs text-slate-400 mt-1">Free API Key from Google AI Studio. Stored strictly in local browser storage.</p>
+        <p class="text-xs text-slate-400 mt-1">Stored safely in browser storage for zero-token bloat.</p>
       </div>
-      <input type="password" id="apiKeyInput" placeholder="Paste AI Studio Key (AIza...)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-violet-500 outline-none">
+      <input type="password" id="apiKeyInput" placeholder="Paste AI Studio Key..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 focus:ring-2 focus:ring-violet-500 outline-none">
       <div class="flex gap-2">
         <button onclick="saveApiKey()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2 rounded-xl text-xs font-semibold">Save</button>
         <button onclick="closeModals()" class="px-3 py-2 text-xs font-medium text-slate-400">Cancel</button>
@@ -420,7 +451,78 @@
     </div>
   </div>
 
-  <!-- Application Logic -->
+  <!-- ================= ADMIN EDITING MODALS ================= -->
+
+  <!-- MODAL: Admin Add Subject -->
+  <div id="addSubjectModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Add New Subject</h3>
+      <input type="text" id="newSubjectName" placeholder="e.g. Social Science, Biology" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
+      <div class="flex gap-2">
+        <button onclick="adminSaveNewSubject()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold py-2 rounded-xl">Add</button>
+        <button onclick="closeModals()" class="px-3 text-xs text-slate-400">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Admin Add Chapter -->
+  <div id="addChapterModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-3">
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Add Chapter to <span id="addChapterSubjectTarget" class="text-violet-600">Physics</span></h3>
+      <input type="text" id="newChapterTitle" placeholder="Chapter Title..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
+      <input type="number" id="newChapterMarks" placeholder="Approx Board Marks (e.g. 7)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-violet-500">
+      <div class="flex gap-2">
+        <button onclick="adminSaveNewChapter()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold py-2 rounded-xl">Save</button>
+        <button onclick="closeModals()" class="px-3 text-xs text-slate-400">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Admin Add PYQ -->
+  <div id="addPyqModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-3">
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Add Frequent PYQ</h3>
+      <select id="newPyqSubject" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none"></select>
+      <input type="text" id="newPyqRecurrence" placeholder="Recurrence (e.g. Asked 6x in Boards)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none">
+      <input type="text" id="newPyqYears" placeholder="Years (e.g. 2024, 2023, 2020)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none">
+      <textarea id="newPyqQuestion" rows="2" placeholder="Full Question Text..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none"></textarea>
+      <textarea id="newPyqSteps" rows="2" placeholder="Step-marking solution guide..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none"></textarea>
+      <div class="flex gap-2">
+        <button onclick="adminSaveNewPyq()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold py-2 rounded-xl">Add PYQ</button>
+        <button onclick="closeModals()" class="px-3 text-xs text-slate-400">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Admin Add Portion Notice & PDF -->
+  <div id="addPortionModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-3">
+      <h3 class="font-bold text-sm text-slate-900 dark:text-white">Add Portion Notice / PDF Circular</h3>
+      <input type="text" id="newPortionSubject" placeholder="Subject Name (e.g. Mathematics)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none">
+      <select id="newPortionStatus" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none">
+        <option value="Deleted">Deleted / Omitted Section</option>
+        <option value="Reduced">Reduced Weightage</option>
+        <option value="Updated">Updated Syllabus Pattern</option>
+        <option value="Active">Official Notice Only</option>
+      </select>
+      <textarea id="newPortionNote" rows="2" placeholder="Portion summary details..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs rounded-xl p-2.5 outline-none"></textarea>
+      
+      <!-- Real PDF file input -->
+      <div class="border border-dashed border-slate-300 dark:border-slate-700 p-3 rounded-xl text-center">
+        <label class="block text-xs font-semibold text-violet-600 dark:text-violet-400 cursor-pointer">
+          <span>Choose Syllabus PDF File</span>
+          <input type="file" id="newPortionPdfFile" accept="application/pdf" class="hidden" onchange="previewPdfFileName(this)">
+        </label>
+        <span id="pdfFileNameDisplay" class="text-[10px] text-slate-400 block mt-1">Optional (Max 5MB)</span>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="adminSaveNewPortion()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold py-2 rounded-xl">Save Notice</button>
+        <button onclick="closeModals()" class="px-3 text-xs text-slate-400">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

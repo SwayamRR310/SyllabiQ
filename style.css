@@ -41,6 +41,20 @@ code, pre {
   color: #a78bfa;
 }
 
+/* Admin Sub tabs */
+.admin-tab {
+  background-color: rgba(241, 245, 249, 0.8);
+  color: rgba(100, 116, 139, 1);
+}
+.dark .admin-tab {
+  background-color: rgba(30, 41, 59, 0.8);
+  color: rgba(148, 163, 184, 1);
+}
+.admin-tab.active {
+  background-color: #7c3aed;
+  color: #ffffff;
+}
+
 /* Custom scrollbars */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
